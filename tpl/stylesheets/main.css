@@ -1,0 +1,54 @@
+/* 
+    Document   : main
+    Created on : Sep 24, 2011, 11:08:02 AM
+    Author     : Andrew
+    Description:
+        Purpose of the stylesheet follows.
+*/
+
+/* 
+   TODO customize this sample style
+   Syntax recommendation http://www.w3.org/TR/REC-CSS2/
+*/
+
+.button {
+    border-radius: 5px;
+    text-shadow: 0 -1px 0 rgba(0,0,0,0.15);
+    box-shadow:
+        0 0 0 1px #0086ba inset, /* Outer bevel */
+        0 0 0 2px #6cdcea inset, /* Inner bevel */
+        0 30px 20px -18px rgba(255,255,255,0.65) inset, /* Inner gradient */
+        1px 1px 3px rgba(0,0,0,0.2) /* Drop shadow */
+    ;
+
+    -webkit-border-radius: 5px;
+    -webkit-text-shadow: 0 -1px 0 rgba(0,0,0,0.15);
+    -webkit-box-shadow:
+        0 0 0 1px #0086ba inset, /* Outer bevel */
+        0 0 0 2px #6cdcea inset, /* Inner bevel */
+        0 30px 20px -18px rgba(255,255,255,0.65) inset, /* Inner gradient */
+        1px 1px 3px rgba(0,0,0,0.2) /* Drop shadow */
+    ;
+}
+
+#box {
+    position:absolute;
+    border:solid black 1px;
+    top:25%;
+    right:25%;
+    bottom:25%;
+    left:25%;
+    padding:25px;
+    margin:25px;
+    }
+    
+    #status {
+    position: bottom;
+    border:solid black 1px;
+    top:90%;
+    right:90%;
+    bottom:90%;
+    left:90%;
+    padding:25px;
+    margin:25px;
+    }

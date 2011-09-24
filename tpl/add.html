@@ -1,0 +1,27 @@
+        <div id="box">
+            <div id="message"></div>
+            <form method="post" id="add">
+                  Mac Address: <input autofocus="TRUE" type="text" name="mac" id="mac" class="required mac"/><br />
+                  Device: 
+                  <select name="device">
+                      {loop="devices"}
+                      <option value="{$value.id}" {if condition="isset($value.selected)"}selected{/if}>{$value.model}</option>
+                      {/loop}
+                  </select><br />
+                  Extention Number: <input type="text" name="ext" id="ext" class="required number"/><br />
+                  User Name: <input type="text" name="displayname" id="displayname"/><br />
+                  <input type="hidden" name="type" value="add"/>
+                  <input type="submit" value="Save" />
+            </form>
+            <div id="status">
+                Status</br>
+            </div>
+        </div>
+        <script>
+            $('.input').keypress(function(e) {
+                if(e.which == 13) {
+                    jQuery(this).blur();
+                    jQuery('#submit').focus().click();
+                }
+            });
+        </script>

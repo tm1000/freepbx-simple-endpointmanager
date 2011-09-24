@@ -1,0 +1,3 @@
+[submodule "includes/provisioner"]
+	path = includes/provisioner
+	url = git://github.com/tm1000/Provisioner.git
