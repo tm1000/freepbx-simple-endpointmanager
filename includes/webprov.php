@@ -13,8 +13,10 @@
 class webprov {
     public $path;
     public $tpl;
+    public $db;
     
     function __construct() {
+        global $db;
         //include freepbx configuration   
         
         $this->path = dirname(__FILE__)."/";
@@ -27,8 +29,57 @@ class webprov {
 
 	//initialize a Rain TPL object
 	$this->tpl = new RainTPL;
+        $this->db = $db;
         
-     
+        if(!$this->table_exists('simple_endpointman_mac_list')) {
+            $this->build_tables();
+        }
+    }
+    
+    function table_exists($table) {
+	global $amp_conf;
+        $sql = "SHOW TABLES FROM ".$amp_conf['AMPDBNAME'];
+        $result = $this->db->getAll($sql);
+
+        foreach($result as $row) {
+            if ($row[0] == $table) {
+                return TRUE;
+            }
+        }
+        return FALSE;
+    }
+    
+    function build_tables() {
+        $sql = "CREATE TABLE IF NOT EXISTS `simple_endpointman_mac_list` (
+                  `id` int(10) NOT NULL auto_increment,
+                  `mac` varchar(12) default NULL,
+                  `model` varchar(11) NOT NULL,
+                  `product` varchar(11) NOT NULL,
+                  `brand` varchar(11) NOT NULL,
+                  `template_id` int(11) NOT NULL,
+                  `global_custom_cfg_data` longblob NOT NULL,
+                  `global_user_cfg_data` longblob NOT NULL,
+                  `config_files_override` text NOT NULL,
+                  `global_settings_override` longblob,
+                  `specific_settings` longblob,
+                  PRIMARY KEY  (`id`),
+                  UNIQUE KEY `mac` (`mac`)
+                ) ENGINE=MyISAM  DEFAULT CHARSET=latin1 ;";
+        
+        $this->db->query($sql);
+        
+        $sql = "CREATE TABLE IF NOT EXISTS `simple_endpointman_line_list` (
+                  `luid` int(11) NOT NULL auto_increment,
+                  `mac_id` int(11) NOT NULL,
+                  `line` smallint(2) NOT NULL,
+                  `ext` varchar(15) NOT NULL,
+                  `description` varchar(20) NOT NULL,
+                  `custom_cfg_data` longblob NOT NULL,
+                  `user_cfg_data` longblob NOT NULL,
+                  PRIMARY KEY  (`luid`)
+                ) ENGINE=MyISAM  DEFAULT CHARSET=latin1";
+        
+        $this->db->query($sql);
     }
     
     function get_devices($selected = NULL) {
@@ -44,8 +95,146 @@ class webprov {
         return($dev_list);
     }
     
+    function genRandomString() {
+        $length = 10;
+        $alphas = 'abcdefghijklmnopqrstuvwxyz';
+        $numas = '0123456789';
+        $string = '';
+        $string .= $alphas[mt_rand(0, strlen($alphas))];
+        $string .= $numas[mt_rand(0, strlen($numas))];
+        for ($p = 0; $p < $length; $p++) {
+            $string .= $alphas[mt_rand(0, strlen($alphas))];
+        }
+        $string .= $numas[mt_rand(0, strlen($numas))];
+        return $string;
+    }
+    
     function add_device($mac,$device,$ext,$name) {
+        $mac = $this->mac_check_clean($mac);
         
+        $secret = $this->genRandomString();
+        dbug($secret);
+        $vars = array(
+            'display' => 'extensions',
+            'type' => 'setup',
+            'action' => 'add',
+            'extdisplay' => '',
+            'extension' => $ext,
+            'name' => $name,
+            'cid_masquerade' => '', 
+            'sipname' => '',
+            'outboundcid' => '', 
+            'ringtimer' => 0,
+            'cfringtimer' => 0,
+            'concurrency_limit' => 0,
+            'callwaiting' => 'enabled',
+            'answermode' => 'disabled',
+            'call_screen' => 0,
+            'pinless' => 'disabled',
+            'emergency_cid' => '',
+            'tech' => 'sip',
+            'hardware' => 'generic',
+            'qnostate' => 'usestate',
+            'newdid_name' => '', 
+            'newdid' => '', 
+            'newdidcid' => '',
+            'devinfo_secret_origional' => '',
+            'devinfo_secret' => $secret,
+            'devinfo_dtmfmode' => 'rfc2833',
+            'devinfo_canreinvite' => 'no',
+            'devinfo_context' => 'from-internal',
+            'devinfo_host' => 'dynamic',
+            'devinfo_trustrpid' => 'yes',
+            'devinfo_sendrpid' => 'no',
+            'devinfo_type' => 'peer',
+            'devinfo_nat' => 'no',
+            'devinfo_port' => '5060',
+            'devinfo_qualify' => 'yes',
+            'devinfo_qualifyfreq' => '60',
+            'devinfo_transport' => 'udp',
+            'devinfo_encryption' => 'no',
+            'devinfo_callgroup' => '',
+            'devinfo_pickupgroup' => '',
+            'devinfo_disallow' => '',
+            'devinfo_allow' => '',
+            'devinfo_dial' => '',
+            'devinfo_accountcode' => '',
+            'devinfo_mailbox' => '',
+            'devinfo_vmexten' => '',
+            'devinfo_deny' => '0.0.0.0/0.0.0.0',
+            'devinfo_permit' => '0.0.0.0/0.0.0.0',
+            'noanswer_dest' => 'goto0',
+            'busy_dest' => 'goto1',
+            'chanunavail_dest' => 'goto2',
+            'dictenabled' => 'disabled',
+            'dictformat' => 'ogg',
+            'dictemail' => '',
+            'langcode' => '',
+            'record_in' => 'Adhoc',
+            'record_out' => 'Adhoc',
+            'vm' => 'disabled'
+        );
+        
+        $_REQUEST['devinfo_secret'] = $secret;
+        $_REQUEST['devinfo_dtmfmode'] = 'rfc2833';
+        if($mac) {
+            if(core_users_add($vars)) {
+                if(core_devices_add($ext, 'sip', '', 'fixed', $ext, $name)) {
+                    needreload();
+                        $sql = "INSERT INTO `simple_endpointman_mac_list` (`mac`, `model`,'brand','product') VALUES ('".$mac."', '".$device."', '7', '3')";
+                        $this->db->query($sql);
+
+                        $sql = 'SELECT last_insert_id()';
+                        $ext_id =& $this->db->getOne($sql);
+                        
+                        $sql = "INSERT INTO `simple_endpointman_line_list` (`mac_id`, `ext`, `line`, `description`) VALUES ('".$ext_id."', '".$ext."', '1', '".addslashes($name)."')";
+                        $this->db->query($sql);
+                    return true; 
+                }
+            }
+        } 
+        return false;
+    }
+    
+    function mac_check_clean($mac) {
+        if ((strlen($mac) == "17") OR (strlen($mac) == "12")) {
+            //It might be better to use switch here instead of these IF statements...
+
+            //Is the mac separated by colons(:) or dashes(-)?
+            if (preg_match("/[0-9a-f][0-9a-f][:-]".
+            "[0-9a-f][0-9a-f][:-]".
+            "[0-9a-f][0-9a-f][:-]".
+            "[0-9a-f][0-9a-f][:-]".
+            "[0-9a-f][0-9a-f][:-]".
+            "[0-9a-f][0-9a-f]/i", $mac)) {
+                return(strtoupper(str_replace(":", "", str_replace("-", "", $mac))));
+                //Is the string exactly 12 characters?
+            } elseif(strlen($mac) == "12") {
+                //Now is the string a valid HEX mac address?
+                if (preg_match("/[0-9a-f][0-9a-f]".
+                "[0-9a-f][0-9a-f]".
+                "[0-9a-f][0-9a-f]".
+                "[0-9a-f][0-9a-f]".
+                "[0-9a-f][0-9a-f]".
+                "[0-9a-f][0-9a-f]/i", $mac)) {
+                    return(strtoupper($mac));
+                } else {
+                    return(FALSE);
+                }
+                //Is the mac separated by whitespaces?
+            } elseif(preg_match("/[0-9a-f][0-9a-f][\s]".
+            "[0-9a-f][0-9a-f][\s]".
+            "[0-9a-f][0-9a-f][\s]".
+            "[0-9a-f][0-9a-f][\s]".
+            "[0-9a-f][0-9a-f][\s]".
+            "[0-9a-f][0-9a-f]/i", $mac)) {
+                return(strtoupper(str_replace(" ", "", $mac)));
+            } else {
+                return(FALSE);
+            }
+        } else {
+            return(FALSE);
+        }
     }
     
     /**

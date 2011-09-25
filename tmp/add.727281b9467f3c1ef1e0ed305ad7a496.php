@@ -10,7 +10,7 @@
                       <?php } ?>
 
                   </select><br />
-                  Extention Number: <input type="text" name="ext" id="ext" class="required number"/><br />
+                  Extention Number: <input type="text" name="ext" id="ext" class="required number ext"/><br />
                   User Name: <input type="text" name="displayname" id="displayname"/><br />
                   <input type="hidden" name="type" value="add"/>
                   <input type="submit" value="Save" />

@@ -26,12 +26,28 @@
                 jQuery.validator.addMethod("mac", function(value, element) { 
                     regex=/^([0-9a-f]{2}([:-])){5}([0-9a-f]{2})$|^([0-9a-f]{2}([.])){5}([0-9a-f]{2})$|^([0-9a-f]{12})$/i;
                     if (regex.test(value)){
-                            return true;
+                            var clean_mac = value.replace(/:/gi,'');
+                            var valid2 = $.ajax({
+                                    url: "ajax.php?type=validmac&mac=" + clean_mac,
+                                    async: false
+                                }).responseText;
+                            valid2 = jQuery.parseJSON(valid2);
+                            return valid2.status;
                     }
                     else{
                             return false;
                     }
                 }, "Please specify a valid mac address");
+                
+                jQuery.validator.addMethod("ext", function(value, element) { 
+                    var valid = $.ajax({
+                                    url: "ajax.php?type=validext&ext=" + value,
+                                    async: false
+                                }).responseText;
+                    valid = jQuery.parseJSON(valid);
+                    return valid.status;
+                }, "This extension is already in use");
+                
                 
                 jQuery("#add").validate();
                 jQuery('#add').ajaxForm(function(responseText, statusText, xhr, $form) { 

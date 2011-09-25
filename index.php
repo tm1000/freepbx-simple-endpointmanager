@@ -18,8 +18,13 @@ if($type == 'add') {
     $ext  = isset($_REQUEST['ext']) ? $_REQUEST['ext'] : '';
     $name  = isset($_REQUEST['displayname']) ? $_REQUEST['displayname'] : '';
 
-    $prov->add_device($mac,$device,$ext,$name);
-    $array = array('status' => 'true');
+    dbug($device);
+    
+    if($prov->add_device($mac,$device,$ext,$name)) {
+        $array = array('success' => 'true');
+    } else {
+        $array = array('success' => 'false');
+    }
     echo json_encode($array);
 }
 

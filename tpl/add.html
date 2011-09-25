@@ -5,10 +5,10 @@
                   Device: 
                   <select name="device">
                       {loop="devices"}
-                      <option value="{$value.id}" {if condition="isset($value.selected)"}selected{/if}>{$value.model}</option>
+                      <option value="{$value.model}" {if condition="isset($value.selected)"}selected{/if}>{$value.model}</option>
                       {/loop}
                   </select><br />
-                  Extention Number: <input type="text" name="ext" id="ext" class="required number"/><br />
+                  Extention Number: <input type="text" name="ext" id="ext" class="required number ext"/><br />
                   User Name: <input type="text" name="displayname" id="displayname"/><br />
                   <input type="hidden" name="type" value="add"/>
                   <input type="submit" value="Save" />
