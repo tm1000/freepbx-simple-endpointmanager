@@ -14,13 +14,13 @@ switch($_REQUEST['type']) {
         }
         break;
     case 'validmac':
-        $sql = "SELECT * FROM simple_endpointman_mac_list WHERE mac = '". $_REQUEST['mac']."'";
-        $res = $db->query($sql);
-        if($res->numRows() > 0) {
-            $json = array('status' => false);
-        } else {
-            $json = array('status' => true);
-        }
+            $sql = "SELECT * FROM simple_endpointman_mac_list WHERE mac = '". $_REQUEST['mac']."'";
+            $res = $db->query($sql);
+            if($res->numRows() > 0) {
+                $json = array('status' => false);
+            } else {
+                $json = array('status' => true);
+            }
         break;
     default:
         $json = array('status' => false);

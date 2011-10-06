@@ -180,7 +180,7 @@ class webprov {
         if($mac) {
             if(core_users_add($vars)) {
                 if(core_devices_add($ext, 'sip', '', 'fixed', $ext, $name)) {
-                    needreload();
+                        needreload();
                         $sql = "INSERT INTO simple_endpointman_mac_list (mac, model,brand,product) VALUES ('".$mac."', '".$device."', 'cisco', 'spa5xx')";
                         dbug($sql);
                         $this->db->query($sql);
@@ -190,6 +190,8 @@ class webprov {
                         
                         $sql = "INSERT INTO `simple_endpointman_line_list` (`mac_id`, `ext`, `line`, `description`) VALUES ('".$ext_id."', '".$ext."', '1', '".addslashes($name)."')";
                         $this->db->query($sql);
+                        
+                        //http://192.168.1.244/admin/resync?http://192.168.1.5/webprov/p.php/spa$PSN.cfg
                     return true; 
                 }
             }

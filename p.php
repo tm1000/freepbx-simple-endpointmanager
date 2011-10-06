@@ -85,7 +85,7 @@ if(preg_match('/[0-9A-Fa-f]{12}/i', $strip, $matches) && !(preg_match('/[0]{10}[
             //$endpoint->proxy[1]['ip'] = $data['data']['statics']['proxyserver'];
             //$endpoint->proxy[1]['port'] = 5060;
 
-            $endpoint->provisioning_path = 'http://www.provisioner.net'.dirname($_SERVER['REQUEST_URI'])."/";
+            $endpoint->provisioning_path = 'www.provisioner.net'.dirname($_SERVER['REQUEST_URI']);
 
             //Loop through Lines!
             foreach($phone_info['line'] as $line) {
