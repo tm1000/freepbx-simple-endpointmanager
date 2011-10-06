@@ -6,7 +6,7 @@
                   <select name="device">
                       <?php $counter1=-1; if( isset($devices) && is_array($devices) && sizeof($devices) ) foreach( $devices as $key1 => $value1 ){ $counter1++; ?>
 
-                      <option value="<?php echo $value1["id"];?>" <?php if( isset($value1["selected"]) ){ ?>selected<?php } ?>><?php echo $value1["model"];?></option>
+                      <option value="<?php echo $value1["model"];?>" <?php if( isset($value1["selected"]) ){ ?>selected<?php } ?>><?php echo $value1["model"];?></option>
                       <?php } ?>
 
                   </select><br />

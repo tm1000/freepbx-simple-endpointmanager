@@ -181,7 +181,8 @@ class webprov {
             if(core_users_add($vars)) {
                 if(core_devices_add($ext, 'sip', '', 'fixed', $ext, $name)) {
                     needreload();
-                        $sql = "INSERT INTO `simple_endpointman_mac_list` (`mac`, `model`,'brand','product') VALUES ('".$mac."', '".$device."', '7', '3')";
+                        $sql = "INSERT INTO simple_endpointman_mac_list (mac, model,brand,product) VALUES ('".$mac."', '".$device."', 'cisco', 'spa5xx')";
+                        dbug($sql);
                         $this->db->query($sql);
 
                         $sql = 'SELECT last_insert_id()';

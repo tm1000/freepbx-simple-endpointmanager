@@ -14,7 +14,7 @@ switch($_REQUEST['type']) {
         }
         break;
     case 'validmac':
-        $sql = 'SELECT * FROM simple_endpointman_mac_list WHERE mac = '. $_REQUEST['mac'];
+        $sql = "SELECT * FROM simple_endpointman_mac_list WHERE mac = '". $_REQUEST['mac']."'";
         $res = $db->query($sql);
         if($res->numRows() > 0) {
             $json = array('status' => false);
