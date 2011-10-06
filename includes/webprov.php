@@ -174,9 +174,8 @@ class webprov {
             'record_out' => 'Adhoc',
             'vm' => 'disabled'
         );
-        
-        $_REQUEST['devinfo_secret'] = $secret;
-        $_REQUEST['devinfo_dtmfmode'] = 'rfc2833';
+        $_REQUEST=$vars;
+
         if($mac) {
             if(core_users_add($vars)) {
                 if(core_devices_add($ext, 'sip', '', 'fixed', $ext, $name)) {

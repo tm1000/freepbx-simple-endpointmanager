@@ -21,7 +21,7 @@ if($type == 'add') {
     dbug($device);
     
     if($prov->add_device($mac,$device,$ext,$name)) {
-        $array = array('success' => 'true');
+        $array = array('success' => 'true','ext' => 'bbb', 'mac' => 'hhh');
     } else {
         $array = array('success' => 'false');
     }
@@ -34,6 +34,9 @@ if(!$blank) {
         case 'add':
             $prov->tpl->assign( 'devices', $prov->get_devices('SPA504G') );
             $prov->tpl->draw( 'add' );
+            break;
+        case 'swap':
+            $prov->tpl->draw( 'swap' );
             break;
         default:
             $prov->tpl->draw( 'index' );

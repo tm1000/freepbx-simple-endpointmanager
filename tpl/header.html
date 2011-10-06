@@ -55,7 +55,7 @@
                     if(statusText == 'success') {
                         var response = jQuery.parseJSON(responseText);
                         $('#message').html(response.status);
-                        $('#status').append('Added Blah to Blah </br>');
+                        $('#status').append('Added '+response.ext+' to '+response.mac+' </br>');
                         $('#mac').focus();
                     }
                 });
