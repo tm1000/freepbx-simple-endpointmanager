@@ -16,12 +16,10 @@ if($type == 'add') {
     $mac  = isset($_REQUEST['mac']) ? $_REQUEST['mac'] : '';
     $device  = isset($_REQUEST['device']) ? $_REQUEST['device'] : '';
     $ext  = isset($_REQUEST['ext']) ? $_REQUEST['ext'] : '';
-    $name  = isset($_REQUEST['displayname']) ? $_REQUEST['displayname'] : '';
-
-    dbug($device);
+    $name  = isset($_REQUEST['displayname']) ? $_REQUEST['displayname'] : $mac;
     
     if($prov->add_device($mac,$device,$ext,$name)) {
-        $array = array('success' => 'true','ext' => 'bbb', 'mac' => 'hhh');
+        $array = array('success' => 'true','ext' => $name, 'mac' => $mac);
     } else {
         $array = array('success' => 'false');
     }
@@ -36,6 +34,7 @@ if(!$blank) {
             $prov->tpl->draw( 'add' );
             break;
         case 'swap':
+            $prov->tpl->assign( 'devices', $prov->get_managed_devices() );
             $prov->tpl->draw( 'swap' );
             break;
         default:
