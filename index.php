@@ -38,6 +38,7 @@ if(!$blank) {
             $prov->tpl->draw( 'swap' );
             break;
         default:
+            $prov->tpl->assign( 'address', 'http://'.$_SERVER["SERVER_NAME"].$_SERVER["REQUEST_URI"].'p.php/' );
             $prov->tpl->draw( 'index' );
             break;
     }

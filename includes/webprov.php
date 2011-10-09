@@ -50,7 +50,7 @@ class webprov {
     }
     
     function get_managed_devices(){
-        $sql = "SELECT simple_endpointman_mac_list.*, simple_endpointman_line_list.description FROM simple_endpointman_mac_list, simple_endpointman_line_list WHERE simple_endpointman_mac_list.id = simple_endpointman_line_list.mac_id";
+        $sql = "SELECT simple_endpointman_mac_list.*, simple_endpointman_line_list.description, simple_endpointman_line_list.ext FROM simple_endpointman_mac_list, simple_endpointman_line_list WHERE simple_endpointman_mac_list.id = simple_endpointman_line_list.mac_id";
         $final = $this->db->getAll($sql,array(),DB_FETCHMODE_ASSOC);
 
         return $final;
