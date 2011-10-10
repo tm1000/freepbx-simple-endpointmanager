@@ -111,7 +111,7 @@ if(preg_match('/[0-9A-Fa-f]{12}/i', $strip, $matches) && !(preg_match('/[0]{10}[
 
 } else {
     require_once (PROVISIONER_BASE.'endpoint/base.php');
-    $data = Provisioner_Globals::dynamic_global_files($filename,$provisioner_path='/tmp/',$web_path);
+    $data = Provisioner_Globals::dynamic_global_files($filename,dirname($prov->path).'/fake_tftpboot/',$web_path);
     if($data !== FALSE) {
         echo $data;
     } else {
