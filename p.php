@@ -76,16 +76,16 @@ if(preg_match('/[0-9A-Fa-f]{12}/i', $strip, $matches) && !(preg_match('/[0]{10}[
             
             	//Timezone
             if (!class_exists("DateTimeZone")) { require(PROVISIONER_BASE.'samples/tz.php'); }
-            $endpoint->DateTimeZone = new DateTimeZone('America/Los_Angeles');
+            $endpoint->DateTimeZone = new DateTimeZone('Australia/Brisbane');
 
             //Server IP Address & Port
-            $endpoint->server[1]['ip'] = '192.168.1.5';
+            $endpoint->server[1]['ip'] = '10.4.100.100';
             $endpoint->server[1]['port'] = 5060;
 
             //$endpoint->proxy[1]['ip'] = $data['data']['statics']['proxyserver'];
             //$endpoint->proxy[1]['port'] = 5060;
 
-            $endpoint->provisioning_path = 'www.provisioner.net'.dirname($_SERVER['REQUEST_URI']);
+            $endpoint->provisioning_path = '10.4.100.100'.dirname($_SERVER['REQUEST_URI']);
 
             //Loop through Lines!
             foreach($phone_info['line'] as $line) {
@@ -93,8 +93,6 @@ if(preg_match('/[0-9A-Fa-f]{12}/i', $strip, $matches) && !(preg_match('/[0]{10}[
             }
             
             $endpoint->options =  array();;
-
-            
 
             $returned_data = $endpoint->generate_config();
                         
