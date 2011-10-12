@@ -124,7 +124,7 @@ class webprov {
 	print "I found $ext. I'm so happy\n";
 	$sql = "delete from simple_endpointman_line_list where ext='$ext'";
 	$this->db->query($sql);
-	$sql = "delete from simple_endpointman_mac_list where ext='$mac'";
+	$sql = "delete from simple_endpointman_mac_list where mac='$mac'";
 	$this->db->query($sql);
 	core_devices_del($ext);
 	core_users_del($ext);
