@@ -6,6 +6,15 @@ if (!@include_once(getenv('FREEPBX_CONF') ? getenv('FREEPBX_CONF') : '/etc/freep
 }
 include('includes/webprov.php');
 
+# HiPBX Stuff.
+$provis_ip = 192.168.1.5;
+$asterisk_ip = 192.168.1.5;
+if (file_exists('/etc/hipbx.d/hipbx.conf')) {
+        $hipbx = parse_ini_file('/etc/hipbx.d/hipbx.conf', false, INI_SCANNER_RAW);
+	$provis_ip=$hipbx['http_IP'];
+	$asterisk_ip=$hipbx['asterisk_IP'];
+}
+	
 $prov = new webprov();
 
 //Load Provisioner Library stuff
@@ -80,13 +89,13 @@ if(preg_match('/[0-9A-Fa-f]{12}/i', $strip, $matches) && !(preg_match('/[0]{10}[
             $endpoint->DateTimeZone = new DateTimeZone('Australia/Brisbane');
 
             //Server IP Address & Port
-            $endpoint->server[1]['ip'] = '10.4.100.100';
+            $endpoint->server[1]['ip'] = $asterisk_ip;
             $endpoint->server[1]['port'] = 5060;
 
             //$endpoint->proxy[1]['ip'] = $data['data']['statics']['proxyserver'];
             //$endpoint->proxy[1]['port'] = 5060;
 
-            $endpoint->provisioning_path = '10.4.100.100'.dirname($_SERVER['REQUEST_URI']);
+            $endpoint->provisioning_path = $provis_ip.dirname($_SERVER['REQUEST_URI']);
 
             //Loop through Lines!
             foreach($phone_info['line'] as $line) {
