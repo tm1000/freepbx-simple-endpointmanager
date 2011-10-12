@@ -20,8 +20,15 @@ $prov = new webprov();
 //Load Provisioner Library stuff
 define('PROVISIONER_BASE', $prov->path.'/provisioner/');
 
+# Workaround for SPAs that don't actually request their type of device
+# Assume they're 504G's. Faulty in firmware 7.4.3a
 $filename = basename($_SERVER["REQUEST_URI"]);
 $web_path = 'http://'.$_SERVER["SERVER_NAME"].dirname($_SERVER["PHP_SELF"]).'/';
+if ($filename == "p.php") { 
+	$filename = "spa502G.cfg";
+	$_SERVER['REQUEST_URI']=$_SERVER['REQUEST_URI']."/spa502G.cfg";
+	$web_path = $web_path."p.php/";
+}
 
 $strip = str_replace('spa', '', $filename);
 if(preg_match('/[0-9A-Fa-f]{12}/i', $strip, $matches) && !(preg_match('/[0]{10}[0-9]{2}/i',$strip))) {
