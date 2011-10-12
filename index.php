@@ -31,12 +31,16 @@ if(!$blank) {
     $prov->tpl->draw( 'header' );
     switch($location) {
         case 'add':
-            $prov->tpl->assign( 'devices', $prov->get_devices('SPA504G') );
+            $prov->tpl->assign( 'devices', $prov->get_devices('SPA502G') );
             $prov->tpl->draw( 'add' );
             break;
         case 'swap':
             $prov->tpl->assign( 'devices', $prov->get_managed_devices() );
             $prov->tpl->draw( 'swap' );
+            break;
+	case 'del':
+            $prov->tpl->assign( 'devices', $prov->get_managed_devices() );
+            $prov->tpl->draw( 'del' );
             break;
         default:
             $prov->tpl->assign( 'address', 'http://'.$_SERVER["SERVER_NAME"].$_SERVER["REQUEST_URI"].'p.php/' );
