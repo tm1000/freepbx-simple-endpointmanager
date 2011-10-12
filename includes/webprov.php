@@ -36,6 +36,67 @@ class webprov {
         }
     }
     
+    function get_data($id, $var, $row = 'custom', $type = 'mac' ) {
+	if ($type === 'line' ) {
+		$tablename = "simple_endpointman_line_list";
+		$colid = "ext";
+		if ($row === 'custom') {
+			$colname = "global_custom_cfg_data";
+		} elseif ($row === 'user') {
+			$colname = "global_user_cfg_data";
+		} else {
+			die ("Unknown line row $row - programmer error");
+		}
+	} elseif ( $type === 'mac' ) {
+		$tablename = "simple_endpointman_mac_list";
+		$colid = "mac";
+		if ($row === 'custom') {
+			$colname = "custom_cfg_data";
+		} elseif ($row === 'user') {
+			$colname = "user_cfg_data";
+		} else {
+			die ("Unknown mac row $row - programmer error");
+		}
+	} else {
+		die ("Unknown type $type - programmer error");
+	}
+	$sql = "SELECT $colname from $tablename where $colid = '$id'";
+        return json_decode($this->db->getOne($sql));
+    }
+
+    function set_data($id, $var, $val, $row = 'custom', $type = 'mac' ) {
+	if ($type === 'line' ) {
+		$tablename = "simple_endpointman_line_list";
+		$colid = "ext";
+		if ($row === 'custom') {
+			$colname = "global_custom_cfg_data";
+		} elseif ($row === 'user') {
+			$colname = "global_user_cfg_data";
+		} else {
+			die ("Unknown line row $row - programmer error");
+		}
+	} elseif ( $type === 'mac' ) {
+		$tablename = "simple_endpointman_mac_list";
+		$colid = "mac";
+		if ($row === 'custom') {
+			$colname = "custom_cfg_data";
+		} elseif ($row === 'user') {
+			$colname = "user_cfg_data";
+		} else {
+			die ("Unknown mac row $row - programmer error");
+		}
+	} else {
+		die ("Unknown type $type - programmer error");
+	}
+	$existing = get_data($id, $var, $row, $type);
+	$existing[$var]=$val;
+	$newcontents=json_encode($existing);
+	$sql = "UPDATE $tablename SET $colname='$newcontent' where $colid = '$newcontents'";
+        return $this->db->query($sql);
+    }
+	
+	
+	
     function table_exists($table) {
 	global $amp_conf;
         $sql = "SHOW TABLES FROM ".$amp_conf['AMPDBNAME'];
