@@ -116,6 +116,7 @@ if(preg_match('/[0-9A-Fa-f]{12}/i', $strip, $matches) && !(preg_match('/[0]{10}[
 		'picture_url' => "http://$provis_ip/logo.bmp",
 		'enable_webserver' => 'Yes',
 		'enable_webserver_admin' => 'Yes',
+		'station_display_name' => 'Provisioned',
             );
 
             $returned_data = $endpoint->generate_config();
