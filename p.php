@@ -7,8 +7,8 @@ if (!@include_once(getenv('FREEPBX_CONF') ? getenv('FREEPBX_CONF') : '/etc/freep
 include('includes/webprov.php');
 
 # HiPBX Stuff.
-$provis_ip = 192.168.1.5;
-$asterisk_ip = 192.168.1.5;
+$provis_ip = '192.168.1.5';
+$asterisk_ip = '192.168.1.5';
 if (file_exists('/etc/hipbx.d/hipbx.conf')) {
         $hipbx = parse_ini_file('/etc/hipbx.d/hipbx.conf', false, INI_SCANNER_RAW);
 	$provis_ip=$hipbx['http_IP'];
