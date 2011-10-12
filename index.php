@@ -27,6 +27,10 @@ if($type == 'add') {
     echo json_encode($array);
 }
 
+if ($type == 'del') {
+	$prov->remove_device($_REQUEST['mac']);
+}
+
 if(!$blank) {
     $prov->tpl->draw( 'header' );
     switch($location) {

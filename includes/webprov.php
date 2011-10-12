@@ -116,6 +116,21 @@ class webprov {
         return $string;
     }
     
+    function remove_device($mac) {
+	# What exten is this?
+	$sql = "select ext from simple_endpointman_line_list l, simple_endpointman_mac_list m where l.mac_id=m.id and m.mac='$mac'";
+	dbug($sql);
+	$ext = $this->db->getOne($sql);
+	print "I found $ext. I'm so happy\n";
+	$sql = "delete from simple_endpointman_line_list where ext='$ext'";
+	$this->db->query($sql);
+	$sql = "delete from simple_endpointman_mac_list where ext='$mac'";
+	$this->db->query($sql);
+	core_devices_del($ext);
+	core_users_del($ext);
+	do_reload();
+    }
+
     function add_device($mac,$device,$ext,$name) {
         $mac = $this->mac_check_clean($mac);
         
