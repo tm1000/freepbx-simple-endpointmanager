@@ -3,15 +3,15 @@
 	    <table>
 	      <tr>
 		<td>Mac Address:</td>
-		<td> <input autofocus="TRUE" type="text" name="mac" id="mac" class="required mac"/> </td>
+		<td colspan=2> <input autofocus="TRUE" type="text" name="mac" id="mac" class="required mac"/> </td>
 	      </tr>
               <tr>
 		<td>Account:</td>
-		<td><input type="text" name="account" id="account"/> &nbsp; <span id="acctinfo"></span></td>
+		<td><input type="text" name="account" id="account"/></td><td id="acctinfo"></td>
 	      </tr>
               <tr>
 	 	<td>Device: </td>
-		<td>
+		<td colspan=2>
 		  <select name="device">
 		    {loop="devices"}
 		      <option value="{$value.model}" {if condition="isset($value.selected)"}selected{/if}>{$value.model}</option>
@@ -21,29 +21,31 @@
 	      </tr>
               <tr>
                 <td>Extention Number: </td>
-		<td><input type="text" name="ext" id="ext" class="required number ext"/> &nbsp; <span id="phoneno"></span></td>
+		<td><input type="text" name="ext" id="ext" class="required number ext"/></td><td id="phoneno"></td>
 	      </tr>
 	      <tr>
                 <td>User Name:</td>
-		<td> <input type="text" name="displayname" id="displayname"/></td>
+		<td colspan=2><input type="text" name="displayname" id="displayname"/></td>
 	      </tr>
 	      <tr>
                 <td>Voicemail Enabled:</td>
-		<td>
-		  <select name="voicemail">
+		<td colspan=2>
+		  <select name="voicemail" id='vmsel'>
 		    <option value="no" selected>No</option>
 		    <option value="yes">Yes</option>
+		  </select>
+		  &nbsp; Voicemail Pin: <input type="text" size=5em name="vmpin" id="vmpin"/>
 		 </td>
 	      </tr>
 	      <tr>
                 <td>Email Address:</td>
-		<td> <input type="text" name="emailaddr" id="emailaddr"/></td>
+		<td colspan=2><input type="text" name="emailaddr" id="emailaddr"/></td>
 	      </tr>
 	    </table>
 	    <input type="hidden" name="type" value="add"/>
 	    <input type="submit" value="Save" />
 	  </form>
-	  <div id="status">Status: </br> </div>
+	  <div id="status">Status: <span id="statustext"></span></div>
         </div> <!-- /box -->	
 <script>
             $('#mac').keypress(function(e) {
@@ -62,9 +64,13 @@
 					$('#displayname').val(data['name']);
 					$('#phoneno').html(data['phone']);
 					$('#voicemail').val(data['voicemail']);
+					$('#vmpin').val(data['pin']);
+					$('#vmsel').val(data['voicemail']);
 					$('#acctinfo').html(data['status']);
+					$('#statustext').html('');
 				} else {
 					$('#acctinfo').html('AJAX Error');
+					$('#statustext').html(data['status']);
 				}
 					
 			});

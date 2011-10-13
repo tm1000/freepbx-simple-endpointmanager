@@ -44,6 +44,7 @@ if ($info['count'] === 0) {
 		'email' => '',
 		'phone' => '',
 		'pin' => '',
+		'voicemail' => 'no',
 		'ext' => '',
 	);
 	echo json_encode($json);
@@ -66,6 +67,13 @@ $json = array(
 	"status" => "Found",
 	"result" => "ok",
 );
+
+if ($info[0]['mail'][0] != "") {
+	$json['voicemail'] = 'yes';
+} else {
+	$json['voicemail'] = 'no';
+	$json['pin'] = '';
+}
 echo json_encode($json);
 
 function jerror($err) {
