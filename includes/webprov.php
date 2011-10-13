@@ -193,7 +193,7 @@ class webprov {
 	do_reload();
     }
 
-    function add_device($mac,$device,$ext,$name) {
+    function add_device($mac,$device,$ext,$name,$vm,$vmpin,$email) {
         $mac = $this->mac_check_clean($mac);
         
         $secret = $this->genRandomString();
@@ -258,12 +258,28 @@ class webprov {
             'record_out' => 'Adhoc',
             'vm' => 'disabled'
         );
+	# But.. is vm REALLY disabled?
+	if ($vm == 'yes') { 
+		$vm = array (
+			'vm' => 'enabled',
+			'mailbox' => $ext,
+			'vmpwd' => $vmpin,
+			'email' => $email,
+			'attach' => 'attach=yes',
+			'saycid' => 'saycid=no',
+			'envelope' => 'envelope=no',
+			'delete' => 'delete=no',
+			'pager' => '',
+			'vmcontext' => 'default',
+		);
+		$vars = array_merge($vars, $vm);
+	}
+
         $_REQUEST=$vars;
 
         if($mac) {
             if(core_users_add($vars)) {
                 if(core_devices_add($ext, 'sip', '', 'fixed', $ext, $name)) {
-                        needreload();
                         $sql = "INSERT INTO simple_endpointman_mac_list (mac, model,brand,product) VALUES ('".$mac."', '".$device."', 'cisco', 'spa5xx')";
                         dbug($sql);
                         $this->db->query($sql);
@@ -274,9 +290,13 @@ class webprov {
                         $sql = "INSERT INTO `simple_endpointman_line_list` (`mac_id`, `ext`, `line`, `description`) VALUES ('".$ext_id."', '".$ext."', '1', '".addslashes($name)."')";
                         $this->db->query($sql);
                         
-                        //http://192.168.1.244/admin/resync?http://192.168.1.5/webprov/p.php/spa$PSN.cfg
-                    return true; 
-                }
+			# Create voicemail
+			if ($vars['vm'] === 'enabled') {
+				voicemail_mailbox_add($ext, $vars);
+			}
+			do_reload();
+			return true; 
+		}
             }
         } 
         return false;
