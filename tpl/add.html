@@ -1,57 +1,72 @@
 	<div id="box">
-	  <div id="message"></div>
-	    <form method="post" id="add">
-	      <table>
-		<tr>
-		  <td>Mac Address:</td>
-		  <td> <input autofocus="TRUE" type="text" name="mac" id="mac" class="required mac"/> </td>
-		</tr>
-                <tr>
-		  <td>Account:</td>
-		  <td><input type="text" name="account" id="account"/></td>
-		</tr>
-                <tr>
-		  <td>Device: </td>
-		  <td>
-		    <select name="device">
-		      {loop="devices"}
-			<option value="{$value.model}" {if condition="isset($value.selected)"}selected{/if}>{$value.model}</option>
-		      {/loop}
-		    </select>
-		  </td>
-		</tr>
-                <tr>
-                  <td>Extention Number: </td>
-		  <td><input type="text" name="ext" id="ext" class="required number ext"/></td>
-		</tr>
-		<tr>
-                  <td>User Name:</td>
-		  <td> <input type="text" name="displayname" id="displayname"/></td>
-		</tr>
-		<tr>
-                  <td>Voicemail Enabled:</td>
-		  <td>
-		    <select name="voicemail">
-		      <option value="vmno" selected>No</option>
-		      <option value="vmyes">Yes</option>
-		   </td>
-		</tr>
-		<tr>
-                  <td>Email Address:</td>
-		  <td> <input type="text" name="displayname" id="displayname"/></td>
-		</tr>
-	      </table>
-	      <input type="hidden" name="type" value="add"/>
-	      <input type="submit" value="Save" />
-	    </form>
-	    <div id="status"> Status</br> </div>
-          </div> <!-- /message -->
-	</div> <!-- /box -->	
-        <script>
-            $('.input').keypress(function(e) {
+	  <form method="post" id="add">
+	    <table>
+	      <tr>
+		<td>Mac Address:</td>
+		<td> <input autofocus="TRUE" type="text" name="mac" id="mac" class="required mac"/> </td>
+	      </tr>
+              <tr>
+		<td>Account:</td>
+		<td><input type="text" name="account" id="account"/> &nbsp; <span id="acctinfo"></span></td>
+	      </tr>
+              <tr>
+	 	<td>Device: </td>
+		<td>
+		  <select name="device">
+		    {loop="devices"}
+		      <option value="{$value.model}" {if condition="isset($value.selected)"}selected{/if}>{$value.model}</option>
+		    {/loop}
+		  </select>
+		</td>
+	      </tr>
+              <tr>
+                <td>Extention Number: </td>
+		<td><input type="text" name="ext" id="ext" class="required number ext"/></td>
+	      </tr>
+	      <tr>
+                <td>User Name:</td>
+		<td> <input type="text" name="displayname" id="displayname"/></td>
+	      </tr>
+	      <tr>
+                <td>Voicemail Enabled:</td>
+		<td>
+		  <select name="voicemail">
+		    <option value="vmno" selected>No</option>
+		    <option value="vmyes">Yes</option>
+		 </td>
+	      </tr>
+	      <tr>
+                <td>Email Address:</td>
+		<td> <input type="text" name="emailaddr" id="emailaddr"/></td>
+	      </tr>
+	    </table>
+	    <input type="hidden" name="type" value="add"/>
+	    <input type="submit" value="Save" />
+	  </form>
+	  <div id="status">Status: </br> </div>
+        </div> <!-- /box -->	
+<script>
+            $('#mac').keypress(function(e) {
                 if(e.which == 13) {
                     jQuery(this).blur();
                     jQuery('#submit').focus().click();
                 }
             });
+	    $('#account').keyup(function() { 
+		if ($('#account').val().length > 4) {
+			$('#acctinfo').html('<i>Searching</i>');
+			$.getJSON("ajax.php?type=checkuser&uid="+$('#account').val(), function (data) { 
+				if (data['status'] == 'found') {
+					$('#ext').val(data['ext']);
+					$('#emailaddr').val(data['email']);
+					$('#displayname').val(data['username']);
+					$('#acctinfo').text(data['status']);
+				} else {
+					$('#acctinfo').html('<i>Not Found</i>');
+				}
+			});
+		} else {
+			$('#acctinfo').text('');
+		} 
+	    });
         </script>
