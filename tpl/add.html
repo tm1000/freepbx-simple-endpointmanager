@@ -1,22 +1,52 @@
-        <div id="box">
-            <div id="message"></div>
-            <form method="post" id="add">
-                  Mac Address: <input autofocus="TRUE" type="text" name="mac" id="mac" class="required mac"/><br />
-                  Device: 
-                  <select name="device">
-                      {loop="devices"}
-                      <option value="{$value.model}" {if condition="isset($value.selected)"}selected{/if}>{$value.model}</option>
-                      {/loop}
-                  </select><br />
-                  Extention Number: <input type="text" name="ext" id="ext" class="required number ext"/><br />
-                  User Name: <input type="text" name="displayname" id="displayname"/><br />
-                  <input type="hidden" name="type" value="add"/>
-                  <input type="submit" value="Save" />
-            </form>
-            <div id="status">
-                Status</br>
-            </div>
-        </div>
+	<div id="box">
+	  <div id="message"></div>
+	    <form method="post" id="add">
+	      <table>
+		<tr>
+		  <td>Mac Address:</td>
+		  <td> <input autofocus="TRUE" type="text" name="mac" id="mac" class="required mac"/> </td>
+		</tr>
+                <tr>
+		  <td>Account:</td>
+		  <td><input type="text" name="account" id="account"/></td>
+		</tr>
+                <tr>
+		  <td>Device: </td>
+		  <td>
+		    <select name="device">
+		      {loop="devices"}
+			<option value="{$value.model}" {if condition="isset($value.selected)"}selected{/if}>{$value.model}</option>
+		      {/loop}
+		    </select>
+		  </td>
+		</tr>
+                <tr>
+                  <td>Extention Number: </td>
+		  <td><input type="text" name="ext" id="ext" class="required number ext"/></td>
+		</tr>
+		<tr>
+                  <td>User Name:</td>
+		  <td> <input type="text" name="displayname" id="displayname"/></td>
+		</tr>
+		<tr>
+                  <td>Voicemail Enabled:</td>
+		  <td>
+		    <select name="voicemail">
+		      <option value="vmno" selected>No</option>
+		      <option value="vmyes">Yes</option>
+		   </td>
+		</tr>
+		<tr>
+                  <td>Email Address:</td>
+		  <td> <input type="text" name="displayname" id="displayname"/></td>
+		</tr>
+	      </table>
+	      <input type="hidden" name="type" value="add"/>
+	      <input type="submit" value="Save" />
+	    </form>
+	    <div id="status"> Status</br> </div>
+          </div> <!-- /message -->
+	</div> <!-- /box -->	
         <script>
             $('.input').keypress(function(e) {
                 if(e.which == 13) {
