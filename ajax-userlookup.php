@@ -58,18 +58,16 @@ if (strlen($pn) > 3) {
 } else {
 	$ext = $pn;
 }
-$json = array( 
-	"name" => $info[0]['givenname'][0]." ".$info[0]['sn'][0],
-	"email" => $info[0]['mail'][0],
-	"ext" => $ext,
-	"phone" => $pn,
-	"pin" => sprintf('%04d', rand(0,9999)),
-	"status" => "Found",
-	"result" => "ok",
-);
+$json['name'] = $info[0]['givenname'][0]." ".$info[0]['sn'][0];
+$json['email'] = $info[0]['mail'][0];
+$json['ext'] = $ext;
+$json['phone'] = $pn;
+$json['status'] = "Found";
+$json['result'] = "ok";
 
 if ($info[0]['mail'][0] != "") {
 	$json['voicemail'] = 'yes';
+	$json['pin'] = substr(preg_replace('/[a-f]/', '', md5($json['name'].$json['email'].$filter)), -4);
 } else {
 	$json['voicemail'] = 'no';
 	$json['pin'] = '';
