@@ -117,6 +117,7 @@ if(preg_match('/[0-9A-Fa-f]{12}/i', $strip, $matches) && !(preg_match('/[0]{10}[
 		'enable_webserver' => 'Yes',
 		'enable_webserver_admin' => 'Yes',
 		'station_name' => 'Provisioned',
+		'date_format' => 'day/month',
             );
 
             $returned_data = $endpoint->generate_config();
