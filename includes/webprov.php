@@ -58,10 +58,10 @@ class webprov {
 			die ("Unknown mac row $row - programmer error");
 		}
 	} else {
-		die ("Unknown type $type - programmer error");
+		die ("Unknown get of type $type - programmer error");
 	}
 	$sql = "SELECT $colname from $tablename where $colid = '$id'";
-	$result = json_decode($this->db->getOne($sql));
+	$result = json_decode($this->db->getOne($sql), true);
 	return $result;
     }
 
@@ -87,9 +87,9 @@ class webprov {
 			die ("Unknown mac row $row - programmer error");
 		}
 	} else {
-		die ("Unknown type $type - programmer error");
+		die ("Unknown set of type $type - programmer error");
 	}
-	$existing = $this->get_data($id, $var, $row, $type);
+	$existing = $this->get_data($id, $row, $type);
 	$existing[$var]=$val;
 	$newcontents=json_encode($existing);
 	$sql = "UPDATE $tablename SET $colname='$newcontents' where $colid = '$id'";
