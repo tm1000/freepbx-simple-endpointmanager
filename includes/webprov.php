@@ -190,6 +190,8 @@ class webprov {
 	$this->db->query($sql);
 	core_devices_del($ext);
 	core_users_del($ext);
+	voicemail_mailbox_remove($ext);
+	voicemail_mailbox_del($ext);
 	do_reload();
     }
 
@@ -265,8 +267,8 @@ class webprov {
 			'mailbox' => $ext,
 			'vmpwd' => $vmpin,
 			'email' => $email,
-			'attach' => 'attach=yes',
-			'saycid' => 'saycid=no',
+			'attach' => 'attach=no',
+			'saycid' => 'saycid=yes',
 			'envelope' => 'envelope=no',
 			'delete' => 'delete=no',
 			'pager' => '',
