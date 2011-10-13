@@ -18,8 +18,12 @@ if($type == 'add') {
     $device  = isset($_REQUEST['device']) ? $_REQUEST['device'] : '';
     $ext  = isset($_REQUEST['ext']) ? $_REQUEST['ext'] : '';
     $name  = isset($_REQUEST['displayname']) ? $_REQUEST['displayname'] : $mac;
+    $vm =  isset($_REQUEST['voicemail']) ?  $_REQUEST['voicemail'] : 'no';
+    $vmpin =  isset($_REQUEST['vmpin']) ?  $_REQUEST['vmpin'] : '0000';
+    $email =  isset($_REQUEST['emailaddr']) ?  $_REQUEST['emailaddr'] : '0000';
     
-    if($prov->add_device($mac,$device,$ext,$name)) {
+    
+    if($prov->add_device($mac,$device,$ext,$name,$vm,$vmpin,$email)) {
         $array = array('success' => 'true','ext' => $name, 'mac' => $mac);
     } else {
         $array = array('success' => 'false');
