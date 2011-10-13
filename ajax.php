@@ -26,9 +26,9 @@ switch($_REQUEST['type']) {
     case 'checkuser':
 	# Here would be clever stuff to do.. things.
 	if ($_REQUEST['uid'] === 'valid') {
-		$json = array('email' => 'fake@fake.com', 'ext' => '333', 'voicemail' => 'yes', 'username' => 'Full Name');
+		$json = array('email' => 'fake@fake.com', 'ext' => '333', 'voicemail' => 'yes', 'username' => 'Full Name', 'status' => 'Found', 'result' => 'ok');
 	} else {
-		$json = array('email' => '', 'ext' => '', 'voicemail' => 'no');
+		$json = array('email' => '', 'ext' => '', 'voicemail' => 'no', 'status' => '<i>Not Found</i>', 'result' => 'ok');
 	}
 	break;
     default:

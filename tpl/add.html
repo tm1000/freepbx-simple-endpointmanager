@@ -31,8 +31,8 @@
                 <td>Voicemail Enabled:</td>
 		<td>
 		  <select name="voicemail">
-		    <option value="vmno" selected>No</option>
-		    <option value="vmyes">Yes</option>
+		    <option value="no" selected>No</option>
+		    <option value="yes">Yes</option>
 		 </td>
 	      </tr>
 	      <tr>
@@ -56,14 +56,16 @@
 		if ($('#account').val().length > 4) {
 			$('#acctinfo').html('<i>Searching</i>');
 			$.getJSON("ajax.php?type=checkuser&uid="+$('#account').val(), function (data) { 
-				if (data['status'] == 'found') {
+				if (data['result'] == 'ok') {
 					$('#ext').val(data['ext']);
 					$('#emailaddr').val(data['email']);
 					$('#displayname').val(data['username']);
-					$('#acctinfo').text(data['status']);
+					$('#voicemail').val(data['voicemail']);
+					$('#acctinfo').html(data['status']);
 				} else {
-					$('#acctinfo').html('<i>Not Found</i>');
+					$('#acctinfo').html('AJAX Error');
 				}
+					
 			});
 		} else {
 			$('#acctinfo').text('');
