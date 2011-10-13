@@ -11,7 +11,7 @@
             $(document).ready(function() {
                 $("body").css("display", "none");
                 
-                $("body").fadeIn(1000);
+                $("body").fadeIn(300);
                 
                 $("a.transition").click(function(event){
                     event.preventDefault();
@@ -55,7 +55,7 @@
                     if(statusText == 'success') {
                         var response = jQuery.parseJSON(responseText);
                         $('#message').html(response.status);
-                        $('#status').append('Added '+response.ext+' to '+response.mac+' </br>');
+                        $('#status').append('Assigned '+response.ext+' to '+response.mac+' </br>');
                         $('#mac').focus();
                     }
                 });
