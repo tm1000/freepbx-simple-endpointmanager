@@ -21,7 +21,7 @@
 	      </tr>
               <tr>
                 <td>Extention Number: </td>
-		<td><input type="text" name="ext" id="ext" class="required number ext"/></td>
+		<td><input type="text" name="ext" id="ext" class="required number ext"/> &nbsp; <span id="phoneno"></span></td>
 	      </tr>
 	      <tr>
                 <td>User Name:</td>
@@ -55,11 +55,12 @@
 	    $('#account').keyup(function() { 
 		if ($('#account').val().length > 4) {
 			$('#acctinfo').html('<i>Searching</i>');
-			$.getJSON("ajax.php?type=checkuser&uid="+$('#account').val(), function (data) { 
+			$.getJSON("ajax-userlookup.php?uid="+$('#account').val(), function (data) { 
 				if (data['result'] == 'ok') {
 					$('#ext').val(data['ext']);
 					$('#emailaddr').val(data['email']);
-					$('#displayname').val(data['username']);
+					$('#displayname').val(data['name']);
+					$('#phoneno').html(data['phone']);
 					$('#voicemail').val(data['voicemail']);
 					$('#acctinfo').html(data['status']);
 				} else {

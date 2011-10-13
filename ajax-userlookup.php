@@ -41,6 +41,10 @@ if ($info['count'] === 0) {
 	$json = array(
 		'status' => '<i>Not Found</i>',
 		'result' => 'ok',
+		'email' => '',
+		'phone' => '',
+		'pin' => '',
+		'ext' => '',
 	);
 	echo json_encode($json);
 	exit;
@@ -59,6 +63,7 @@ $json = array(
 	"ext" => $ext,
 	"phone" => $pn,
 	"pin" => sprintf('%04d', rand(0,9999)),
+	"status" => "Found",
 	"result" => "ok",
 );
 echo json_encode($json);
