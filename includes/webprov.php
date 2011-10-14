@@ -22,6 +22,8 @@ class webprov {
         $this->path = dirname(__FILE__)."/";
                 
 	require($this->path."rain.tpl.class.php");
+        require_once $this->path.'provisioner/samples/json.php';
+
 
 	raintpl::configure("base_url", null );
 	raintpl::configure("tpl_dir", "tpl/" );

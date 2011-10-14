@@ -94,7 +94,7 @@ class generate_gui {
                                         $items_loop[$var_nam][$z] = $item_loop;
                                         $items_loop[$var_nam][$z]['description'] = str_replace('{$count}', $i, $items_loop[$var_nam][$z]['description']);
                                         //$items_loop[$var_nam][$z]['variable'] = str_replace('_', '_'.$i.'_', $items_loop[$var_nam][$z]['variable']);
-                                        $items_loop[$var_nam][$z]['default_value'] = fix_single_array_keys($items_loop[$var_nam][$z]['default_value']);
+                                        $items_loop[$var_nam][$z]['default_value'] = $this->fix_single_array_keys($items_loop[$var_nam][$z]['default_value']);
                                         $items_loop[$var_nam][$z]['default_value'] = str_replace('{$count}', $i, $items_loop[$var_nam][$z]['default_value']);
                                         $items_loop[$var_nam][$z]['line_loop'] = TRUE;
                                         $items_loop[$var_nam][$z]['line_count'] = $i;
@@ -139,11 +139,12 @@ class generate_gui {
         return($data);
     }
     
-    function generate_html($html_els,$variable=NULL,$allowed=NULL) {
+    function generate_html($html_els,$variable=NULL,$override_value=NULL,$allowed=NULL,$disallowed=NULL) {
         $allowed = isset($allowed) ? $allowed : array();
         $variable = isset($variable) ? $variable : str_replace('\$', '', $html_els['variable']);
-        if(empty($allowed) OR in_array($variable, $allowed)) {
+        if((empty($disallowed) OR !in_array($variable, $disallowed)) AND (empty($allowed) OR in_array($variable, $allowed))) {
             $value = isset($html_els['value']) ? $html_els['value'] : $this->fix_single_array_keys($html_els['default_value']);
+            $value = isset($override_value) ? $override_value : $value;
             switch ($html_els['type']) {
                 case 'input':
                     $html = $html_els['description'] . ': <input type="text" name="' . $variable . '" value="' . $value . '"/>';
@@ -175,9 +176,8 @@ class generate_gui {
                     break;
             }
             return($html);
-        } else {
-            return(FALSE);
         }
+        return(FALSE);
     }
 
 //FUNCTIONS BELOW------------------
