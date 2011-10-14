@@ -107,6 +107,7 @@ if(preg_match('/[0-9A-Fa-f]{12}/i', $strip, $matches) && !(preg_match('/[0]{10}[
 	    # Get any specific params for the device
 	    $devp = $prov->get_data($mac, 'user', 'mac'); // defaults to 'custom', and 'mac'
 
+
             //Loop through Lines!
             foreach($phone_info['line'] as $line) {
                 $endpoint->lines[$line['line']] = array(
@@ -117,7 +118,7 @@ if(preg_match('/[0-9A-Fa-f]{12}/i', $strip, $matches) && !(preg_match('/[0]{10}[
 		if ($line['description'] === $devp['displayname']) {
 			$endpoint->lines[$line['line']]['displayname'] = $line['ext'];
 		} else {
-			$endpoint->lines[$line['line']]['displayname'] = $line['description'];
+			$endpoint->lines[$line['line']]['displayname'] = checkname($line['description']);
 		}
             }
             
@@ -128,7 +129,7 @@ if(preg_match('/[0-9A-Fa-f]{12}/i', $strip, $matches) && !(preg_match('/[0]{10}[
 		'picture_url' => "http://$provis_ip/logo.bmp",
 		'enable_webserver' => 'Yes',
 		'enable_webserver_admin' => 'Yes',
-		'station_name' => $devp['displayname'],
+		'station_name' => checkname($devp['displayname']),
 		'date_format' => 'day/month',
             );
 
@@ -153,4 +154,35 @@ if(preg_match('/[0-9A-Fa-f]{12}/i', $strip, $matches) && !(preg_match('/[0]{10}[
     } else {
         header("HTTP/1.0 404 Not Found");
     }
+}
+
+function checkname($name) {
+	# Figure out if a name is too long.
+	if (strlen($name) <= 12) {
+		# Well, that was easy.
+		return $name;
+	} 
+	# It's too long. Damn. Lets try to preserve as much info as possible.
+	list($fn, $ln) = explode(' ', $name, 2);
+	$lfn = strlen($fn);
+	$lln = strlen($ln);
+	# Can we get away with just shortening the first name?
+	if ($lln + 2 <= 12) {
+		# We can. Good. Lets do that.
+		return substr($fn, 0, 1)." $ln";
+	}
+	# Hmm. Ok. How about just the second name?
+	if ($lfn + 2 <= 12) {
+		return "$fn ".substr($ln, 0, 1);
+	}
+	# Both the first name AND the Last name are longer than 10 chars.
+	# Can we have JUST the last name or JUST the first name?
+	if ($lln <= 12) {
+		return $ln;
+	} elseif ($lfn <= 12) {
+		return $fn;
+	}
+	# You're just being difficult.  First initial, plus the first 8 chars of
+	# the last name, plus '..' 
+	return substr($fn, 0, 1)." ".substr($ln, 0, 8)."..";
 }
