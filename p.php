@@ -131,6 +131,16 @@ if(preg_match('/[0-9A-Fa-f]{12}/i', $strip, $matches) && !(preg_match('/[0]{10}[
 		'enable_webserver_admin' => 'Yes',
 		'station_name' => checkname($devp['displayname']),
 		'date_format' => 'day/month',
+		'ring1' => 'n=External;w=3;c=9',
+		'ring2' => 'n=Internal;w=3;c=1',
+		'ring3' => 'n=24;w=4;c=1',
+		'ring4' => 'n=Alt-1;w=1;c=1',
+		'ring5' => 'n=Alt-2;w=2;c=1',
+		'ring6' => '',
+		'ring7' => '',
+		'ring8' => '',
+		'ring9' => '',
+		'ring10' => '',
             );
 
             $returned_data = $endpoint->generate_config();
