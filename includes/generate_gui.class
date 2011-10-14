@@ -1,0 +1,349 @@
+<?php
+
+class generate_gui {
+
+    function create_template_array($brand,$product,$model) {        
+        if(!file_exists(PROVISIONER_PATH . "endpoint/" . $brand . "/" . $product . "/family_data.xml")) { die('Cant find family_data.xml'); }
+        $temp = $this->xml2array(PROVISIONER_PATH . "endpoint/" . $brand . "/" . $product . "/family_data.xml");
+        $test = $this->arraysearchrecursive($model, $temp, 'model');
+        if (!$test) {
+            die('cant find model');
+        }
+        $data['phone_data']['brand'] = $brand;
+        $data['phone_data']['product'] = $product;
+        $data['phone_data']['model'] = $model;
+        $data['admin'] = TRUE;
+        $data['lines'] = $temp['data']['model_list'][$test[2]]['lines'];
+        $files = $this->fix_single_array_keys($temp['data']['model_list'][$test[2]]['template_data']['files']);
+        if (!is_array($files)) {
+            $file[0] = $files;
+            $files = $file;
+        }
+        
+        if(file_exists(PROVISIONER_PATH . "endpoint/global_template_data.xml")) {
+            $global_data = $this->xml2array(PROVISIONER_PATH . "endpoint/global_template_data.xml");
+            $categories = $this->fix_single_array_keys($global_data['template_data']['category']);
+            $global_data = $this->merge_files($categories, $data);
+        } else {
+            $global_data = array();
+        }
+
+
+        $data['data'] = array();
+        foreach ($files as $files_data) {
+            if (file_exists(PROVISIONER_PATH . "endpoint/" . $brand . "/" . $product . "/" . $files_data)) {
+                $temp_files_data = $this->xml2array(PROVISIONER_PATH . "endpoint/" . $brand . "/" . $product . "/" . $files_data);
+                $categories = $this->fix_single_array_keys($temp_files_data['template_data']['category']);
+                $data2 = $this->merge_files($categories, $data);
+                $data['data'] = array_merge($data['data'], $data2['data']);
+            }
+        }
+
+        //Allow people to add their own special 'global' items if needed
+        if(!empty($global_data)) {
+            foreach ($global_data['data']['globals']['globals'] as $key_er => $data_er) {
+                if (array_key_exists($key_er, $data['data']['globals']['globals'])) {
+                    $olddata = $data['data']['globals']['globals'][$key_er];
+                    $newdata = $global_data['data']['globals']['globals'][$key_er];
+                    $data['data']['globals']['globals'][$key_er] = array_merge($newdata, $olddata);
+                } else {
+                    $data['data']['globals']['globals'][$key_er] = $data_er;
+                }
+            }
+        }
+        return($data);
+    }
+
+    function merge_files($categories, $data) {
+        $items_fin = array();
+        foreach ($categories as $cat_data) {
+            $subcategories = $this->fix_single_array_keys($cat_data['subcategory']);
+            foreach ($subcategories as $subcat_data) {
+                $items = $this->fix_single_array_keys($subcat_data['item']);
+                $items_loop = array();
+                foreach ($items as $key => $loop_data) {
+                    switch ($loop_data['type']) {
+                        case "loop":
+                            for ($i = $loop_data['loop_start']; $i <= $loop_data['loop_end']; $i++) {
+                                $name = explode("_", $loop_data['data']['item'][0]['variable']);
+                                $var_nam = "loop|" . str_replace("\$", "", $name[0]) . "_" . $i;
+                                foreach ($loop_data['data']['item'] as $item_loop) {
+                                    if ($item_loop['type'] != 'break') {
+                                        $z_tmp = explode("_", $item_loop['variable']);
+                                        $z = $z_tmp[1];
+                                        $items_loop[$var_nam][$z] = $item_loop;
+                                        $items_loop[$var_nam][$z]['description'] = str_replace('{$count}', $i, $items_loop[$var_nam][$z]['description']);
+                                        $items_loop[$var_nam][$z]['variable'] = str_replace('_', '_' . $i . '_', $items_loop[$var_nam][$z]['variable']);
+                                        $items_loop[$var_nam][$z]['default_value'] = isset($items_loop[$var_nam][$z]['default_value']) ? $items_loop[$var_nam][$z]['default_value'] : '';
+                                        $items_loop[$var_nam][$z]['loop'] = TRUE;
+                                        $items_loop[$var_nam][$z]['loop_count'] = $i;
+                                    } else {
+                                        $items_loop[$var_nam][] = array('type' => 'break', 'default_value' => 'corn');
+                                    }
+                                }
+                            }
+                            unset($items[$key]);
+                            $items_fin = array_merge($items_fin, $items_loop);
+                            break;
+                        case "loop_line_options":
+                            for ($i = 1; $i <= $data['lines']; $i++) {
+                                $var_nam = "lineloop|line_" . $i;
+                                foreach ($loop_data['data']['item'] as $item_loop) {
+                                    if ($item_loop['type'] != 'break') {
+                                        $z = str_replace("\$", "", $item_loop['variable']);
+                                        $items_loop[$var_nam][$z] = $item_loop;
+                                        $items_loop[$var_nam][$z]['description'] = str_replace('{$count}', $i, $items_loop[$var_nam][$z]['description']);
+                                        //$items_loop[$var_nam][$z]['variable'] = str_replace('_', '_'.$i.'_', $items_loop[$var_nam][$z]['variable']);
+                                        $items_loop[$var_nam][$z]['default_value'] = fix_single_array_keys($items_loop[$var_nam][$z]['default_value']);
+                                        $items_loop[$var_nam][$z]['default_value'] = str_replace('{$count}', $i, $items_loop[$var_nam][$z]['default_value']);
+                                        $items_loop[$var_nam][$z]['line_loop'] = TRUE;
+                                        $items_loop[$var_nam][$z]['line_count'] = $i;
+                                    } else {
+                                        $items_loop[$var_nam][] = array('type' => 'break', 'default_value' => 'corn');
+                                    }
+                                }
+                            }
+                            unset($items[$key]);
+                            $items_fin = array_merge($items_fin, $items_loop);
+                            break;
+                        case "break":
+                            //unset($items[$key]);
+                            $items_fin[][] = array('type' => 'break', 'default_value' => 'corn');
+                            break;
+                        default:
+                            unset($items[$key]);
+                            $var_nam = "option|" . str_replace("\$", "", $loop_data['variable']);
+                            $items_fin[$var_nam][] = $loop_data;
+                            break;
+                    }
+                }
+                if (array_key_exists('data', $data) && array_key_exists($cat_data['name'], $data['data'])) {
+                    if (array_key_exists($subcat_data['name'], $data['data'][$cat_data['name']])) {
+                        $oldsub = $data['data'][$cat_data['name']][$subcat_data['name']];
+                        $data['data'][$cat_data['name']][$subcat_data['name']] = array_merge($oldsub, $items_fin);
+                        foreach ($oldsub as $old_keys => $old_data) {
+                            if (array_key_exists($old_keys, $items_fin)) {
+                                die('Duplicate variables detected!');
+                            }
+                        }
+                    } else {
+                        $oldsub = $data['data'][$cat_data['name']];
+                        $itout[$subcat_data['name']] = $items_fin;
+                        $data['data'][$cat_data['name']] = array_merge($oldsub, $itout);
+                    }
+                } else {
+                    $data['data'][$cat_data['name']][$subcat_data['name']] = $items_fin;
+                }
+            }
+        }
+        return($data);
+    }
+    
+    function generate_html($html_els,$variable=NULL,$allowed=NULL) {
+        $allowed = isset($allowed) ? $allowed : array();
+        $variable = isset($variable) ? $variable : str_replace('\$', '', $html_els['variable']);
+        if(empty($allowed) OR in_array($variable, $allowed)) {
+            $value = isset($html_els['value']) ? $html_els['value'] : $this->fix_single_array_keys($html_els['default_value']);
+            switch ($html_els['type']) {
+                case 'input':
+                    $html = $html_els['description'] . ': <input type="text" name="' . $variable . '" value="' . $value . '"/>';
+                    break;
+                case 'break':
+                    $html = '';
+                    break;
+                case 'list':
+                    $html = $html_els['description'] . "<select name='" . $variable . "'>";
+                    foreach ($html_els['data'] as $list) {
+                        $selected = ($value == $list['value']) ? 'selected' : '';
+                        $html .= '<option value="' . $list['value'] . '" ' . $selected . '>' . $list['text'] . '</option>';
+                    }
+                    $html .= "</select>";
+                    break;
+                case 'radio':
+                    $html = $html_els['description'] . ':';
+                    foreach ($html_els['data'] as $list) {
+                        $checked = ($value == $list['value']) ? 'checked' : '';
+                        $html .= '|<input type="radio" name="' . $variable . '" value="' . $list['value'] . '" ' . $checked . '/>' . $list['text'];
+                    }
+                    break;
+                case 'checkbox':
+                    $checked = $value ? 'checked' : '';
+                    $html = $html_els['description'] . ': <input type="checkbox" name="' . $variable . '" value="' . $html_els['key'] . ' '.$checked.'"/>';
+                    break;
+                default:
+                    $html = '';
+                    break;
+            }
+            return($html);
+        } else {
+            return(FALSE);
+        }
+    }
+
+//FUNCTIONS BELOW------------------
+    /**
+     * Search Recursively through an array
+     * @param string $Needle
+     * @param array $Haystack
+     * @param string $NeedleKey
+     * @param boolean $Strict
+     * @param array $Path
+     * @return array
+     */
+    function arraysearchrecursive($Needle, $Haystack, $NeedleKey="", $Strict=false, $Path=array()) {
+        if (!is_array($Haystack))
+            return false;
+        foreach ($Haystack as $Key => $Val) {
+            if (is_array($Val) &&
+                    $SubPath = $this->arraysearchrecursive($Needle, $Val, $NeedleKey, $Strict, $Path)) {
+                $Path = array_merge($Path, Array($Key), $SubPath);
+                return $Path;
+            } elseif ((!$Strict && $Val == $Needle &&
+                    $Key == (strlen($NeedleKey) > 0 ? $NeedleKey : $Key)) ||
+                    ($Strict && $Val === $Needle &&
+                    $Key == (strlen($NeedleKey) > 0 ? $NeedleKey : $Key))) {
+                $Path[] = $Key;
+                return $Path;
+            }
+        }
+        return false;
+    }
+
+   /**
+     * xml2array() will convert the given XML text to an array in the XML structure.
+     * @author http://www.bin-co.com/php/scripts/xml2array/
+     * @param <type> $url The XML file
+     * @param <type> $get_attributes 1 or 0. If this is 1 the function will get the attributes as well as the tag values - this results in a different array structure in the return value.
+     * @param <type> $priority Can be 'tag' or 'attribute'. This will change the way the resulting array structure. For 'tag', the tags are given more importance.
+     * @param <type> $array_tags - any tag names listed here will allways be returned as an array, even if there is only one of them.
+     * @return <type> The parsed XML in an array form. Use print_r() to see the resulting array structure.
+     */
+    function xml2array($url, $get_attributes = 1, $priority = 'tag', $array_tags=array()) {
+        $contents = "";
+        if (!function_exists('xml_parser_create')) {
+            return array();
+        }
+        $parser = xml_parser_create('');
+        if (!($fp = @ fopen($url, 'rb'))) {
+            return array();
+        }
+        while (!feof($fp)) {
+            $contents .= fread($fp, 8192);
+        }
+        fclose($fp);
+        xml_parser_set_option($parser, XML_OPTION_TARGET_ENCODING, "UTF-8");
+        xml_parser_set_option($parser, XML_OPTION_CASE_FOLDING, 0);
+        xml_parser_set_option($parser, XML_OPTION_SKIP_WHITE, 1);
+        xml_parse_into_struct($parser, trim($contents), $xml_values);
+        xml_parser_free($parser);
+        if (!$xml_values) {
+            return; //Hmm...
+        }
+        $xml_array = array();
+        $parents = array();
+        $opened_tags = array();
+        $arr = array();
+        $current = & $xml_array;
+        $repeated_tag_index = array();
+        foreach ($xml_values as $data) {
+            unset($attributes, $value);
+            extract($data);
+            $result = array();
+            $attributes_data = array();
+            if (isset($value)) {
+                if ($priority == 'tag') {
+                    $result = $value;
+                } else {
+                    $result['value'] = $value;
+                }
+            }
+            if (isset($attributes) and $get_attributes) {
+                foreach ($attributes as $attr => $val) {
+                    if ($priority == 'tag') {
+                        $attributes_data[$attr] = $val;
+                    } else {
+                        $result['attr'][$attr] = $val; //Set all the attributes in a array called 'attr'
+                    }
+                }
+            }
+            if ($type == "open") {
+                $parent[$level - 1] = & $current;
+		if (!is_array($current) or (!in_array($tag, array_keys($current)))) {
+		    if (in_array($tag,$array_tags)) {
+                        $current[$tag][0] = $result;
+                        $repeated_tag_index[$tag . '_' . $level]=1;
+                    	$current = & $current[$tag][0];
+		    } else {
+			$current[$tag] = $result;
+			if ($attributes_data) {
+				$current[$tag . '_attr'] = $attributes_data;
+			}
+			$repeated_tag_index[$tag . '_' . $level] = 1;
+			$current = & $current[$tag];
+		   }
+                } else {
+                    if (isset($current[$tag][0])) {
+                        $current[$tag][$repeated_tag_index[$tag . '_' . $level]] = $result;
+                        $repeated_tag_index[$tag . '_' . $level]++;
+                    } else {
+                        $current[$tag] = array($current[$tag], $result);
+                        $repeated_tag_index[$tag . '_' . $level] = 2;
+                        if (isset($current[$tag . '_attr'])) {
+                            $current[$tag]['0_attr'] = $current[$tag . '_attr'];
+                            unset($current[$tag . '_attr']);
+                        }
+                    }
+                    $last_item_index = $repeated_tag_index[$tag . '_' . $level] - 1;
+                    $current = & $current[$tag][$last_item_index];
+                }
+            } else if ($type == "complete") {
+                if (!isset($current[$tag])) {
+                    $current[$tag] = $result;
+                    $repeated_tag_index[$tag . '_' . $level] = 1;
+                    if ($priority == 'tag' and $attributes_data) {
+                        $current[$tag . '_attr'] = $attributes_data;
+                    }
+                } else {
+                    if (isset($current[$tag][0]) and is_array($current[$tag])) {
+                        $current[$tag][$repeated_tag_index[$tag . '_' . $level]] = $result;
+                        if ($priority == 'tag' and $get_attributes and $attributes_data) {
+                            $current[$tag][$repeated_tag_index[$tag . '_' . $level] . '_attr'] = $attributes_data;
+                        }
+                        $repeated_tag_index[$tag . '_' . $level]++;
+                    } else {
+                        $current[$tag] = array($current[$tag], $result);
+                        $repeated_tag_index[$tag . '_' . $level] = 1;
+                        if ($priority == 'tag' and $get_attributes) {
+                            if (isset($current[$tag . '_attr'])) {
+                                $current[$tag]['0_attr'] = $current[$tag . '_attr'];
+                                unset($current[$tag . '_attr']);
+                            }
+                            if ($attributes_data) {
+                                $current[$tag][$repeated_tag_index[$tag . '_' . $level] . '_attr'] = $attributes_data;
+                            }
+                        }
+                        $repeated_tag_index[$tag . '_' . $level]++; //0 and 1 index is already taken
+                    }
+                }
+            } else if ($type == 'close') {
+                $current = & $parent[$level - 1];
+            }
+        }
+        return ($xml_array);
+    }
+
+    function fix_single_array_keys($array) {
+        if (!is_array($array)) {
+            return $array;
+        }
+
+        if ((empty($array[0])) AND (!empty($array))) {
+            $array_n[0] = $array;
+
+            return($array_n);
+        }
+
+        return empty($array) ? '' : $array;
+    }
+
+}
