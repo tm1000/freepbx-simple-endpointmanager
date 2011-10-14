@@ -104,9 +104,21 @@ if(preg_match('/[0-9A-Fa-f]{12}/i', $strip, $matches) && !(preg_match('/[0]{10}[
 
             $endpoint->provisioning_path = $provis_ip.dirname($_SERVER['REQUEST_URI']);
 
+	    # Get any specific params for the device
+	    $devp = $prov->get_data($mac, 'user', 'mac'); // defaults to 'custom', and 'mac'
+
             //Loop through Lines!
             foreach($phone_info['line'] as $line) {
-                $endpoint->lines[$line['line']] = array('ext' => $line['ext'], 'secret' => $line['secret'], 'displayname' => $line['description']);
+                $endpoint->lines[$line['line']] = array(
+			'ext' => $line['ext'], 
+			'secret' => $line['secret'],
+		);
+		# Don't duplicate the phone's name on the extension line.
+		if ($line['description'] === $devp['displayname']) {
+			$endpoint->lines[$line['line']]['displayname'] = $line['ext'];
+		} else {
+			$endpoint->lines[$line['line']]['displayname'] = $line['description'];
+		}
             }
             
             $endpoint->options =  array(
@@ -116,7 +128,7 @@ if(preg_match('/[0-9A-Fa-f]{12}/i', $strip, $matches) && !(preg_match('/[0]{10}[
 		'picture_url' => "http://$provis_ip/logo.bmp",
 		'enable_webserver' => 'Yes',
 		'enable_webserver_admin' => 'Yes',
-		'station_name' => 'Provisioned',
+		'station_name' => $devp['displayname'],
 		'date_format' => 'day/month',
             );
 

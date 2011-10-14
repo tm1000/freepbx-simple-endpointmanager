@@ -66,7 +66,7 @@ class webprov {
     }
 
     function set_data($id, $var, $val, $row = 'custom', $type = 'mac' ) {
-	if ($type === 'line' ) {
+	if ($type === 'line' || $type === 'ext' ) {
 		$tablename = "simple_endpointman_line_list";
 		$colid = "ext";
 		if ($row === 'custom') {
@@ -296,6 +296,8 @@ class webprov {
 			if ($vars['vm'] === 'enabled') {
 				voicemail_mailbox_add($ext, $vars);
 			}
+			# Set the phone's name to be the users name
+			$this->set_data($mac, 'displayname', $name, 'user', 'mac');
 			do_reload();
 			return true; 
 		}
