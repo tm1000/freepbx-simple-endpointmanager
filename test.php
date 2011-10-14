@@ -13,7 +13,8 @@ $show_only = array();
 
 $admin = TRUE;
 
-echo '<form>';
+echo '<form method="post" id="add">';
+        echo '<table>';
 
 foreach($output['data'] as $sections => $data) {
     $show_sections = TRUE;
@@ -30,12 +31,12 @@ foreach($output['data'] as $sections => $data) {
                 if($html_els['default_value'] != 'corn') { //Left over breaks that can be safely ignored (basically corn)
                     $output = $gui->generate_html($html_els,$var,$show_only);
                     if($output !== FALSE) {
-                        echo $show_sections ? "<h1>" . $sections . "</h1>" : '';
-                        echo $show_subsections ? "<h2>" . $subsections . "</h2>" : '';
+                        echo $show_sections ? "<tr><td colspan='2'><h1>" . $sections . "</h1></td></tr>" : '';
+                        echo $show_subsections ? "<tr><td colspan='2'><h2>" . $subsections . "</h2></td></tr>" : '';
                         
                         $admin_out = $admin ? '<input type="checkbox" name="admin|'.$var.'" value="Bike" /> Allow Users to edit this' : '';
                         
-                        echo $output.$admin_out.'<br/>';
+                        echo '<tr><td>'.$output.'</td><td>'.$admin_out.'</td></tr>';
 
                         $show_sections = FALSE;
                         $show_subsections = FALSE;
@@ -47,5 +48,9 @@ foreach($output['data'] as $sections => $data) {
         }
     }
 }
+        echo '</table>';
 
+
+echo '<input type="submit" value="Save" />';
+echo '</form>';
 
