@@ -31,6 +31,25 @@ if($type == 'add') {
     echo json_encode($array);
 }
 
+if($type == 'swap') {
+    $blank = TRUE;
+    $newmac = isset($_REQUEST['newmac']) ? $_REQUEST['newmac'] : '';
+    $id = isset($_REQUEST['id']) ? $_REQUEST['id'] : '';
+    
+    if(!empty($id) && !empty($newmac)) {
+
+        $sql = "UPDATE simple_endpointman_mac_list SET mac = '".$newmac."' WHERE id = ". $id;
+        $prov->db->query($sql);
+
+        //re-boot
+
+        $array = array('success' => true, 'newmac' => $newmac);
+    } else {
+        $array = array('success' => false, 'message' => 'ID or Mac not set');
+    }
+    echo json_encode($array);
+}
+
 if ($type == 'del') {
 	$prov->remove_device($_REQUEST['mac']);
 }
@@ -49,6 +68,10 @@ if(!$blank) {
 	case 'del':
             $prov->tpl->assign( 'devices', $prov->get_managed_devices() );
             $prov->tpl->draw( 'del' );
+            break;
+	case 'manage':
+            $prov->tpl->assign( 'devices', $prov->get_managed_devices() );
+            $prov->tpl->draw( 'manage' );
             break;
         default:
             $prov->tpl->assign( 'address', 'http://'.$_SERVER["SERVER_NAME"].$_SERVER["REQUEST_URI"].'p.php/' );
