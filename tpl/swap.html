@@ -16,7 +16,7 @@
         regex=/^([0-9a-f]{2}([:-])){5}([0-9a-f]{2})$|^([0-9a-f]{2}([.])){5}([0-9a-f]{2})$|^([0-9a-f]{12})$/i;
             if (regex.test(newmac)){
                 var oldmac = $("#" + id + "-oldmac").val();
-                jQuery.post("index.php", { "type": "swap", "id": id, "newmac":  newmac},
+                jQuery.post("ajax.php", { "type": "swap", "id": id, "newmac":  newmac},
                  function(data){
                    if(data.success) {
                        $("#" + id + "-displaymac").html(data.newmac);

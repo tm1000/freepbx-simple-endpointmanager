@@ -1,5 +1,4 @@
 <?php
-
 # Loads a couple of vars from /etc/hipbx.d/ldap.conf
 # Should be in the format:
 #

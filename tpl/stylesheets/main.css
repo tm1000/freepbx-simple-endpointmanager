@@ -34,10 +34,10 @@
 #box {
     position:absolute;
     border:solid black 1px;
-    top:25%;
-    right:25%;
-    bottom:25%;
-    left:25%;
+    top:10%;
+    right:10%;
+    bottom:10%;
+    left:10%;
     padding:25px;
     margin:25px;
     }

@@ -2,9 +2,35 @@
             <a href="#" onclick="history.go(-1)">Back</a>
             <div id="message"></div>
             <table cellspacing="20">
-                <tr><td><strong>Display Name</strong></td><td><strong>Extension</strong></td><td><strong>Old Mac Address</strong></td></tr>
+                <tr><td><strong>Display Name</strong></td><td><strong>Extension</strong></td><td><strong>Old Mac Address</strong></td><td><strong>Phone Model</strong></td><td><strong>Enable Sidecar 1</strong></td><td><strong>Enable Sidecar 2</strong></td><td></td><td></td><td></td></tr>
             {loop="devices"}
-            <tr><td>{$value.description}</td><td>{$value.ext}</td><td><span id="{$value.id}-displaymac">{$value.mac}</span></td></tr>
+            <tr id="{$value.id}-row"><td>{$value.description}</td><td>{$value.ext}</td><td><span id="{$value.id}-displaymac">{$value.mac}</span></td><td>
+                    <select name="model" id="{$value.id}-model">
+		    {loop="value.devices_list"}
+		      <option value="{$value.model}" {if condition="isset($value.selected)"}selected{/if}>{$value.model}</option>
+		    {/loop}
+		  </select>
+                </td><td><select name="enable_sidecar1" id="{$value.id}-enable_sidecar1"><option value="true">No</option><option value="true" {if condition="$value.global_settings_override.enable_sidecar1 == TRUE"}selected{/if}>Yes</option></select></td><td><select id="{$value.id}-enable_sidecar2" name="enable_sidecar2"><option value="true">No</option><option value="true" {if condition="$value.global_settings_override.enable_sidecar2 == TRUE"}selected{/if}>Yes</option></select></td><td><a href="index.php?location=manage_phone&mac={$value.mac}">User Edit</a></td><td><a href="index.php?location=manage_phone&mac={$value.mac}&admin=1">Admin Edit</a></td><td><a href="#" onclick="save({$value.id},'{$value.mac}')">Save</a></td></tr>
+            
             {/loop}
             <table>
         </div>
+
+<script type="text/javascript" charset="utf-8"> 
+    
+    function save(id,mac) {
+        var model = $("#" + id + "-model").val();
+        var enable_sidecar1 = $("#" + id + "-enable_sidecar1").val();
+        var enable_sidecar2 = $("#" + id + "-enable_sidecar2").val();
+        jQuery.post("ajax.php", { "type": "manage", "mac": mac, "id": id, "model":  model, "enable_sidecar1": enable_sidecar1, "enable_sidecar2": enable_sidecar2},
+        function(data){
+            if(data.success) {
+                //stuff      
+                console.log(data);
+            } else {
+                //do other stuff
+            }
+        }, "json");
+    }
+
+</script>

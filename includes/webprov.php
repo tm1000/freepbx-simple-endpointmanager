@@ -38,6 +38,24 @@ class webprov {
         }
     }
     
+    function get_device_info($mac) {
+        $sql = "SELECT * FROM simple_endpointman_mac_list WHERE mac = '".$mac."'";
+        $row = $this->db->getRow($sql,array(), DB_FETCHMODE_ASSOC);
+        if(!empty($row['global_custom_cfg_data'])) {
+            $row['global_custom_cfg_data'] = json_decode($row['global_custom_cfg_data'],TRUE);
+        } else {
+            $row['global_custom_cfg_data'] = array();
+        }
+        
+        if(!empty($row['global_user_cfg_data'])) {
+            $row['global_user_cfg_data'] = json_decode($row['global_user_cfg_data'],TRUE);
+        } else {
+            $row['global_user_cfg_data'] = array();
+        }        
+        return($row);
+
+    }
+    
     function get_data($id, $row = 'custom', $type = 'mac' ) {
 	if ($type === 'line' ) {
 		$tablename = "simple_endpointman_line_list";
@@ -56,6 +74,8 @@ class webprov {
 			$colname = "global_custom_cfg_data";
 		} elseif ($row === 'user') {
 			$colname = "global_user_cfg_data";
+                } elseif ($row === 'settings') {
+			$colname = "global_settings_override";
 		} else {
 			die ("Unknown mac row $row - programmer error");
 		}
@@ -83,8 +103,10 @@ class webprov {
 		$colid = "mac";
 		if ($row === 'custom') {
 			$colname = "global_custom_cfg_data";
-		} elseif ($row === 'user') {
-			$colname = "global_user_cfg_data";
+		} elseif ($row === 'settings') {
+			$colname = "global_settings_override";
+                } elseif ($row === 'user') {
+                    $colname = "global_user_cfg_data";
 		} else {
 			die ("Unknown mac row $row - programmer error");
 		}
@@ -92,6 +114,7 @@ class webprov {
 		die ("Unknown set of type $type - programmer error");
 	}
 	$existing = $this->get_data($id, $row, $type);
+        
 	$existing[$var]=$val;
 	$newcontents=json_encode($existing);
 	$sql = "UPDATE $tablename SET $colname='$newcontents' where $colid = '$id'";
@@ -116,8 +139,19 @@ class webprov {
     function get_managed_devices(){
         $sql = "SELECT simple_endpointman_mac_list.*, simple_endpointman_line_list.description, simple_endpointman_line_list.ext FROM simple_endpointman_mac_list, simple_endpointman_line_list WHERE simple_endpointman_mac_list.id = simple_endpointman_line_list.mac_id";
         $final = $this->db->getAll($sql,array(),DB_FETCHMODE_ASSOC);
-
-        return $final;
+        
+        
+        foreach($final as $key => $data) {
+            $final_data[$key] = $data;
+            $final_data[$key]['devices_list'] = $this->get_devices($data['model']);
+            if(!empty($final_data[$key]['global_settings_override'])) {
+                $final_data[$key]['global_settings_override'] = json_decode($final_data[$key]['global_settings_override'],TRUE);
+            } else {
+                $final_data[$key]['global_settings_override'] = array("enable_sidecar1" => true, "enable_sidecar2" => true);
+            }
+        }
+        
+        return $final_data;
     }
     
     function build_tables() {
@@ -183,9 +217,7 @@ class webprov {
     function remove_device($mac) {
 	# What exten is this?
 	$sql = "select ext from simple_endpointman_line_list l, simple_endpointman_mac_list m where l.mac_id=m.id and m.mac='$mac'";
-	dbug($sql);
 	$ext = $this->db->getOne($sql);
-	print "I found $ext. I'm so happy\n";
 	$sql = "delete from simple_endpointman_line_list where ext='$ext'";
 	$this->db->query($sql);
 	$sql = "delete from simple_endpointman_mac_list where mac='$mac'";
@@ -197,11 +229,10 @@ class webprov {
 	do_reload();
     }
 
-    function add_device($mac,$device,$ext,$name,$vm,$vmpin,$email) {
+    function add_device($mac,$device,$ext,$name,$vm,$vmpin,$email, $prov_vars) {
         $mac = $this->mac_check_clean($mac);
         
         $secret = $this->genRandomString();
-        dbug($secret);
         $vars = array(
             'display' => 'extensions',
             'type' => 'setup',
@@ -287,10 +318,14 @@ class webprov {
 
         $_REQUEST=$vars;
 
+        //Prevent FreePBX from outputting html! So annoying!
+        ob_start();
         if($mac) {
             if(core_users_add($vars)) {
                 if(core_devices_add($ext, 'sip', '', 'fixed', $ext, $name)) {
-                        $sql = "INSERT INTO simple_endpointman_mac_list (mac, model,brand,product) VALUES ('".$mac."', '".$device."', 'cisco', 'spa5xx')";
+                        //erase all PHP buffers!
+                        ob_end_clean();
+                        $sql = "INSERT INTO simple_endpointman_mac_list (mac, model,brand,product,global_settings_override) VALUES ('".$mac."', '".$device."', 'cisco', 'spa5xx','".addslashes(json_encode($prov_vars))."')";
                         dbug($sql);
                         $this->db->query($sql);
 
@@ -311,12 +346,14 @@ class webprov {
 			}
 
 			# Set the phone's name to be the users name
-			$this->set_data($mac, 'displayname', $name, 'user', 'mac');
+                        //TODO: add this back
 			do_reload();
 			return true; 
 		}
             }
-        } 
+        }
+        //Erase all PHP Buffers!
+        ob_end_clean();
         return false;
     }
     

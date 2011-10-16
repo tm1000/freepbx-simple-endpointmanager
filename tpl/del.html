@@ -1,22 +1,20 @@
 <div id="box">
 	<div id="message"></div>
-		<table cellspacing="20">
+		<table cellspacing="20" id="table">
 			<tr><td><strong>Display Name</strong></td>
 				<td><strong>Extension</strong></td>
 				<td><strong>MAC Address</strong></td>
 				<td></td>
 			</tr>
 		{loop="devices"}
-			<tr><td>{$value.description}</td>
+			<tr id="{$value.id}-row"><td>{$value.description}</td>
 				<td>{$value.ext}</td>
 				<td>{$value.mac}</td>
 				<td> 
-					<form method="post" id="del">
 					<input type="hidden" name="mac" value="{$value.mac}"/>
 					<input type="hidden" name="type" value="del"/>
 					<input type="hidden" name="location" value=""/>
-					<input type="submit" value="Delete" onclick="del('{$value.mac}')" />
-					</form>
+					<input type="submit" value="Delete" onclick="del('{$value.mac}','{$value.id}')" />
 				</td>
 			</tr>
                 {/loop}
@@ -24,8 +22,21 @@
 	</div>
 </div>
 <script type="text/javascript" charset="utf-8"> 
-    function del(id) {
-                return confirm('Are you sure you want to delete MAC '+id+'?');
+    function del(id,rowid) {
+        var r=confirm('Are you sure you want to delete MAC '+id+'?');
+        if (r==true)
+        {
+        jQuery.post("ajax.php", { "type": "delete", "mac": id},
+            function(data){
+                console.log(data);
+                if(data.success) {
+                    //do stuff
+                    $("#" + rowid + "-row").fadeOut(300, function() { 
+                        $(this).remove(); 
+                    });
+                }
+            }, "json");
+        }
     }
 </script>
     

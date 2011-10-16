@@ -2,7 +2,7 @@
 
 class generate_gui {
 
-    function create_template_array($brand,$product,$model) {        
+    function create_template_array($brand,$product,$model,$dont_load) {        
         if(!file_exists(PROVISIONER_PATH . "endpoint/" . $brand . "/" . $product . "/family_data.xml")) { die('Cant find family_data.xml'); }
         $temp = $this->xml2array(PROVISIONER_PATH . "endpoint/" . $brand . "/" . $product . "/family_data.xml");
         $test = $this->arraysearchrecursive($model, $temp, 'model');
@@ -28,10 +28,9 @@ class generate_gui {
             $global_data = array();
         }
 
-
         $data['data'] = array();
         foreach ($files as $files_data) {
-            if (file_exists(PROVISIONER_PATH . "endpoint/" . $brand . "/" . $product . "/" . $files_data)) {
+            if (file_exists(PROVISIONER_PATH . "endpoint/" . $brand . "/" . $product . "/" . $files_data) && !in_array($files_data, $dont_load)) {
                 $temp_files_data = $this->xml2array(PROVISIONER_PATH . "endpoint/" . $brand . "/" . $product . "/" . $files_data);
                 $categories = $this->fix_single_array_keys($temp_files_data['template_data']['category']);
                 $data2 = $this->merge_files($categories, $data);

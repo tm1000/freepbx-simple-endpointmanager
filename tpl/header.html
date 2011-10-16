@@ -50,7 +50,7 @@
                     return valid.status;
                 }, "This extension is already in use");
                 
-                
+                //TODO: Speed this up
                 jQuery("#add").validate();
                 jQuery('#add').ajaxForm(function(responseText, statusText, xhr, $form) { 
                     jQuery('#add').resetForm();

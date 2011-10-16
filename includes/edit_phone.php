@@ -1,44 +1,97 @@
 <?php
+$mac = isset($_REQUEST['mac']) ? $_REQUEST['mac'] : NULL;
+
+if(isset($_REQUEST['save'])) {
+    $options = array();
+    $lines = array();
+
+    foreach ($_REQUEST as $key => $value) {
+        if ((preg_match('/(.*)\|(.*)\|(.*)/', $key, $matches)) OR (preg_match('/(.*)\|(.*)/', $key, $matches))) {
+            switch ($matches[1]) {
+                case 'loop':
+                    if (preg_match('/(.*)_(.*)_(.*)/', $matches[2], $matches2)) {
+                        $options['data'][$matches2[1]][$matches2[2]][$matches2[3]] = $value;
+                    } else {
+                        die('Invalid Loop');
+                    }
+                    break;
+                case 'option':
+                    $options['data'][$matches[2]] = $value;
+                    break;
+                case 'admin':
+                    $options['admin'][$matches[2] . '|' . $matches[3]] = TRUE;
+                    break;
+                case 'lineloop':
+                    if (preg_match('/^(.*)_(\d)_(.*)$/', $matches[2], $matches2)) {
+                        $options['lines'][$matches2[2]][$matches2[3]] = $value;
+                    } else {
+                        die('invalid line option');
+                    }
+                    break;
+                default:
+                    die('DEFLECTOR SHEILDS UP');
+            }
+        }
+    }
+        
+    if (isset($_POST['admin']) && ($_POST['admin'] == 1)) {
+            $sql = "UPDATE simple_endpointman_mac_list SET global_custom_cfg_data = '" . addslashes(json_encode($options)) . "' WHERE mac = '" . $mac . "'";
+            $prov->db->query($sql);
+    } else {
+            $sql = "UPDATE simple_endpointman_mac_list SET global_user_cfg_data = '" . addslashes(json_encode($options)) . "' WHERE mac = '" . $mac . "'";
+            $prov->db->query($sql);    }
+}
 
 $bootstrap_settings['freepbx_auth'] = false;
 if (!@include_once(getenv('FREEPBX_CONF') ? getenv('FREEPBX_CONF') : '/etc/freepbx.conf')) {
-    include_once('/etc/asterisk/freepbx.conf');
+    //include_once('/etc/asterisk/freepbx.conf');
 }
-include('includes/webprov.php');
 
 $admin = isset($_REQUEST['admin']) ? true : false;
-require_once 'includes/provisioner/samples/json.php';
+
+if(isset($mac)) {
+    $device_info = $prov->get_device_info($mac);
+    if(empty($device_info['global_custom_cfg_data']) && !$admin) {
+        die('Device has not been setup by an admin!');
+    }
+} else {
+    die('Mac not set');
+}
+
+$global_settings = $prov->get_data($mac, 'settings', 'mac');
+
+print_r($global_settings);
+
+$has_sidecar1 = !$global_settings['has_sidecar1'] ?  NULL : 'a_unit1.xml';
+$has_sidecar2 = !$global_settings['has_sidecar2'] ?  NULL : 'a_unit2.xml';
 
 DEFINE('PROVISIONER_PATH', 'includes/provisioner/');
 DEFINE('BRAND', 'cisco');
 DEFINE('PRODUCT', 'spa5xx');
 
+
 $only_show = array();
 
-$prov = new webprov();
-
-$ext = 333;
 
 // Get user config data.
-$user_data = $prov->get_data($ext, 'user', 'line');
-// What sort of phone do they have?
-$sql = "select model from simple_endpointman_mac_list m, simple_endpointman_line_list l where l.mac_id=m.id and l.ext='$ext'";
-$model = $db->getOne($sql) or die("Wut. No exten");
-
-//Get admin data if exists
-if (file_exists(BRAND . '_' . PRODUCT . '_' .$model. '.json')) {
-    $data = file_get_contents(BRAND . '_' . PRODUCT . '_' .$model. '.json');
-    $saved_data = json_decode($data, TRUE);
+$user_data = $device_info['global_user_cfg_data'];
+if(isset($mac)) {
+    $saved_data = $device_info['global_custom_cfg_data'];
     if (!$admin) {
         foreach ($saved_data['admin'] as $key => $data) {
             $only_show[] = $key;
         }
     }
+} else {
+    $saved_data = array();
 }
+
+// What sort of phone do they have?
+$model = $device_info['model'];
 
 include('includes/generate_gui.class');
 
-
+/*
 // Lets do some sanity checking. Has this phone been modified?
 if (isset($user_data['provisioned']) != true) {
 	// It hasn't. Lets set it up with some defaults.
@@ -58,14 +111,25 @@ if (isset($user_data['provisioned']) != true) {
 	// And now, reload our data.
 	$user_data = $prov->get_data($ext, 'user', 'line');
 }
-
+ *
+ */
 
 $gui = new generate_gui();
-$output = $gui->create_template_array(BRAND, PRODUCT, $model);
-print_r($output);
-exit;
+$dont_load = array($has_sidecar1,$has_sidecar2);
+
+$output = $gui->create_template_array(BRAND, PRODUCT, $model,$dont_load);
 
 $dont_show = array(
+    'loop|lineops_1_displaynameline',
+    'loop|lineops_1_keytype',
+    'loop|lineops_1_blfext',
+    'option|upgrade_path',
+    'option|page_code',
+    'option|webserver_port',
+    'option|administrator_password',
+    'option|user_password',
+    'option|enable_upgrade',
+    'option|text_logo',
     'option|dial_plan',
     'option|background_type',
     'option|logo_type',
@@ -86,7 +150,7 @@ $dont_show = array(
     'option|ring10'
 );
 
-echo '<form method="post" action="go.php" id="add">';
+echo '<form method="post" id="edit">';
 echo '<table>';
 
 foreach ($output['data'] as $sections => $data) {
@@ -130,7 +194,10 @@ foreach ($output['data'] as $sections => $data) {
                         echo $show_sections ? "<tr><td colspan='2'><h1>" . $sections . "</h1></td></tr>" : '';
                         echo $show_subsections ? "<tr><td colspan='2'><h2>" . $subsections . "</h2></td></tr>" : '';
 
-                        $admin_out = $admin ? '<input type="checkbox" name="admin|' . $var . '" value="Bike" /> Allow Users to edit this' : '';
+                        if(!empty($saved_data['admin'])) {
+                            $checked = isset($saved_data['admin'][$var]) ? 'checked' : '';
+                        }
+                        $admin_out = $admin ? '<input type="checkbox" name="admin|' . $var . '" value="Bike" '.$checked.'/> Allow Users to edit this' : '';
 
                         echo '<tr><td>' . $output . '</td><td>' . $admin_out . '</td></tr>';
 
@@ -147,10 +214,13 @@ foreach ($output['data'] as $sections => $data) {
 echo '</table>';
 
 //ghetto hack, will fix later
-echo '<input type="hidden" name="admin" value="' . $admin . '"/>';
+$admin_line = $admin ? '<input type="hidden" name="admin" value="' . $admin . '"/>' : '';
+echo $admin_line;
 echo '<input type="hidden" name="brand" value="' . BRAND . '"/>';
 echo '<input type="hidden" name="product" value="' . PRODUCT . '"/>';
 echo '<input type="hidden" name="model" value="' .$model . '"/>';
+echo '<input type="hidden" name="mac" value="' .$mac . '"/>';
+echo '<input type="hidden" name="save" value="true"/>';
 echo '<input type="submit" value="Save" />';
 echo '</form>';
 

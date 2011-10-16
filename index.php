@@ -1,5 +1,7 @@
 <?php
 $blank = FALSE;
+require_once 'includes/provisioner/samples/json.php';
+
 $bootstrap_settings['freepbx_auth'] = false;
 if (!@include_once(getenv('FREEPBX_CONF') ? getenv('FREEPBX_CONF') : '/etc/freepbx.conf')) {
     include_once('/etc/asterisk/freepbx.conf');
@@ -11,48 +13,6 @@ $prov = new webprov();
 
 $location = isset($_REQUEST['location']) ? $_REQUEST['location'] : '';
 $type  = isset($_REQUEST['type']) ? $_REQUEST['type'] : '';
-
-if($type == 'add') {
-    $blank = TRUE;
-    $mac  = isset($_REQUEST['mac']) ? $_REQUEST['mac'] : '';
-    $device  = isset($_REQUEST['device']) ? $_REQUEST['device'] : '';
-    $ext  = isset($_REQUEST['ext']) ? $_REQUEST['ext'] : '';
-    $name  = isset($_REQUEST['displayname']) ? $_REQUEST['displayname'] : $mac;
-    $vm =  isset($_REQUEST['voicemail']) ?  $_REQUEST['voicemail'] : 'no';
-    $vmpin =  isset($_REQUEST['vmpin']) ?  $_REQUEST['vmpin'] : '0000';
-    $email =  isset($_REQUEST['emailaddr']) ?  $_REQUEST['emailaddr'] : '0000';
-    
-    
-    if($prov->add_device($mac,$device,$ext,$name,$vm,$vmpin,$email)) {
-        $array = array('success' => 'true','ext' => $name, 'mac' => $mac);
-    } else {
-        $array = array('success' => 'false');
-    }
-    echo json_encode($array);
-}
-
-if($type == 'swap') {
-    $blank = TRUE;
-    $newmac = isset($_REQUEST['newmac']) ? $_REQUEST['newmac'] : '';
-    $id = isset($_REQUEST['id']) ? $_REQUEST['id'] : '';
-    
-    if(!empty($id) && !empty($newmac)) {
-
-        $sql = "UPDATE simple_endpointman_mac_list SET mac = '".$newmac."' WHERE id = ". $id;
-        $prov->db->query($sql);
-
-        //re-boot
-
-        $array = array('success' => true, 'newmac' => $newmac);
-    } else {
-        $array = array('success' => false, 'message' => 'ID or Mac not set');
-    }
-    echo json_encode($array);
-}
-
-if ($type == 'del') {
-	$prov->remove_device($_REQUEST['mac']);
-}
 
 if(!$blank) {
     $prov->tpl->draw( 'header' );
@@ -72,6 +32,9 @@ if(!$blank) {
 	case 'manage':
             $prov->tpl->assign( 'devices', $prov->get_managed_devices() );
             $prov->tpl->draw( 'manage' );
+            break;
+        case 'manage_phone':
+            include 'includes/edit_phone.php';
             break;
         default:
             $prov->tpl->assign( 'address', 'http://'.$_SERVER["SERVER_NAME"].$_SERVER["REQUEST_URI"].'p.php/' );
