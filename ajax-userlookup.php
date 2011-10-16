@@ -12,7 +12,10 @@
 # I expect you to know what you're doing here.
 
 
-$config = parse_ini_file("/etc/hipbx.d/ldap.conf", INI_SCANNER_RAW);
+if (!function_exists('ldap_connect')) {
+	jerror("Unable to do user lookups without php-ldap");
+}
+$config = @parse_ini_file("/etc/hipbx.d/ldap.conf", INI_SCANNER_RAW);
 if ($config === false) {
 	jerror("Unable to parse /etc/hipbx.d/ldap.conf");
 }
