@@ -42,7 +42,7 @@ if(preg_match('/[0-9A-Fa-f]{12}/i', $strip, $matches) && !(preg_match('/[0]{10}[
             
 
             $phone_info = $prov->get_device_info($mac);
-            print_r($phone_info);
+            //print_r($phone_info);
 
             $sql = "SELECT simple_endpointman_line_list.*, sip.data as secret, devices.*, simple_endpointman_line_list.description AS epm_description FROM simple_endpointman_line_list, sip, devices WHERE simple_endpointman_line_list.ext = devices.id AND simple_endpointman_line_list.ext = sip.id AND sip.keyword = 'secret' AND simple_endpointman_line_list.mac_id = ".$phone_info['id']." ORDER BY simple_endpointman_line_list.line ASC";
             $lines_info = $db->getAll($sql, array(), DB_FETCHMODE_ASSOC);
@@ -143,7 +143,9 @@ if(preg_match('/[0-9A-Fa-f]{12}/i', $strip, $matches) && !(preg_match('/[0]{10}[
             
             $options = array_merge($static_options,$phone_info['global_custom_cfg_data']['data']);
             
-            $endpoint->options = $options;
+            $options_final = array_merge($options,$phone_info['global_user_cfg_data']['data']);
+            
+            $endpoint->options = $options_final;
 
             $returned_data = $endpoint->generate_config();
                         
