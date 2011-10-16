@@ -11,6 +11,7 @@
 #
 # I expect you to know what you're doing here.
 
+require_once 'includes/provisioner/samples/json.php';
 
 if (!function_exists('ldap_connect')) {
 	jerror("Unable to do user lookups without php-ldap");
