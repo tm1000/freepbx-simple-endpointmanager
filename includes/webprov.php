@@ -278,6 +278,12 @@ class webprov {
 		);
 		$vars = array_merge($vars, $vm);
 	}
+	# Is the fax module available? Do we have an email address? If so, add faxing.
+	if (function_exists('fax_detect') && $vars['email'] != '') {
+		# Can we fax? If so, add faxing.
+		$vars['faxenabled']=true;
+		$vars['faxemail']=$vars['email'];
+	}
 
         $_REQUEST=$vars;
 
@@ -298,6 +304,12 @@ class webprov {
 			if ($vars['vm'] === 'enabled') {
 				voicemail_mailbox_add($ext, $vars);
 			}
+
+			# Set up faxing if required
+			if ($vars['faxenabled'] === true) {
+				fax_save_user($ext,true,$vars['email']);
+			}
+
 			# Set the phone's name to be the users name
 			$this->set_data($mac, 'displayname', $name, 'user', 'mac');
 			do_reload();
