@@ -40,11 +40,9 @@ if(preg_match('/[0-9A-Fa-f]{12}/i', $strip, $matches) && !(preg_match('/[0]{10}[
         $res = $db->query($sql);
         if($res->numRows() > 0) {
             
-                        //Returns Brand Name, Brand Directory, Model Name, Mac Address, Extension (FreePBX), Custom Configuration Template, Custom Configuration Data, Product Name, Product ID, Product Configuration Directory, Product Configuration Version, Product XML name,
-            $sql = "SELECT * FROM simple_endpointman_mac_list WHERE mac = '". $mac . "'";
 
-            $phone_info = $db->getRow($sql, array(), DB_FETCHMODE_ASSOC);
-
+            $phone_info = $prov->get_device_info($mac);
+            print_r($phone_info);
 
             $sql = "SELECT simple_endpointman_line_list.*, sip.data as secret, devices.*, simple_endpointman_line_list.description AS epm_description FROM simple_endpointman_line_list, sip, devices WHERE simple_endpointman_line_list.ext = devices.id AND simple_endpointman_line_list.ext = sip.id AND sip.keyword = 'secret' AND simple_endpointman_line_list.mac_id = ".$phone_info['id']." ORDER BY simple_endpointman_line_list.line ASC";
             $lines_info = $db->getAll($sql, array(), DB_FETCHMODE_ASSOC);
@@ -122,7 +120,7 @@ if(preg_match('/[0-9A-Fa-f]{12}/i', $strip, $matches) && !(preg_match('/[0]{10}[
 		}
             }
             
-            $endpoint->options =  array(
+            $static_options =  array(
 		'dial_plan'=>'(*4xxx|**xxx|*80xxx|*xx|[1-9]xx|0000|0112|0[23457]xxxxxxx|00[23478]xxxxxxxx|011xx|012[238]x|012x.|01300xxxxxx|013[1-9]xxx|01800xxxxxx|018xxxx|0190)',
 		'background_type' => 'BMP Picture',
 		'logo_type' => 'BMP Picture',
@@ -142,6 +140,10 @@ if(preg_match('/[0-9A-Fa-f]{12}/i', $strip, $matches) && !(preg_match('/[0]{10}[
 		'ring9' => '',
 		'ring10' => '',
             );
+            
+            $options = array_merge($static_options,$phone_info['global_custom_cfg_data']['data']);
+            
+            $endpoint->options = $options;
 
             $returned_data = $endpoint->generate_config();
                         

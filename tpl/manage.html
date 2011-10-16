@@ -10,7 +10,7 @@
 		      <option value="{$value.model}" {if condition="isset($value.selected)"}selected{/if}>{$value.model}</option>
 		    {/loop}
 		  </select>
-                </td><td><select name="enable_sidecar1" id="{$value.id}-enable_sidecar1"><option value="true">No</option><option value="true" {if condition="$value.global_settings_override.enable_sidecar1 == TRUE"}selected{/if}>Yes</option></select></td><td><select id="{$value.id}-enable_sidecar2" name="enable_sidecar2"><option value="true">No</option><option value="true" {if condition="$value.global_settings_override.enable_sidecar2 == TRUE"}selected{/if}>Yes</option></select></td><td><a href="index.php?location=manage_phone&mac={$value.mac}">User Edit</a></td><td><a href="index.php?location=manage_phone&mac={$value.mac}&admin=1">Admin Edit</a></td><td><a href="#" onclick="save({$value.id},'{$value.mac}')">Save</a></td></tr>
+                </td><td><select name="enable_sidecar1" id="{$value.id}-enable_sidecar1"><option value="false">No</option><option value="true" {if condition="$value.global_settings_override.enable_sidecar1 == TRUE"}selected{/if}>Yes</option></select></td><td><select id="{$value.id}-enable_sidecar2" name="enable_sidecar2"><option value="true">No</option><option value="true" {if condition="$value.global_settings_override.enable_sidecar2 == TRUE"}selected{/if}>Yes</option></select></td><td><a href="index.php?location=manage_phone&mac={$value.mac}">User Edit</a></td><td><a href="index.php?location=manage_phone&mac={$value.mac}&admin=1">Admin Edit</a></td><td><a href="#" onclick="save({$value.id},'{$value.mac}')">Save</a></td></tr>
             
             {/loop}
             <table>
