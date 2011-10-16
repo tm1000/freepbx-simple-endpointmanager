@@ -1,20 +1,33 @@
 <?php
 
+$bootstrap_settings['freepbx_auth'] = false;
+if (!@include_once(getenv('FREEPBX_CONF') ? getenv('FREEPBX_CONF') : '/etc/freepbx.conf')) {
+    include_once('/etc/asterisk/freepbx.conf');
+}
+include('includes/webprov.php');
+
 $admin = isset($_REQUEST['admin']) ? true : false;
-
 require_once 'includes/provisioner/samples/json.php';
-
 
 DEFINE('PROVISIONER_PATH', 'includes/provisioner/');
 DEFINE('BRAND', 'cisco');
 DEFINE('PRODUCT', 'spa5xx');
-DEFINE('MODEL', 'SPA504G');
 
 $only_show = array();
 
+$prov = new webprov();
+
+$ext = 333;
+
+// Get user config data.
+$user_data = $prov->get_data($ext, 'user', 'line');
+// What sort of phone do they have?
+$sql = "select model from simple_endpointman_mac_list m, simple_endpointman_line_list l where l.mac_id=m.id and l.ext='$ext'";
+$model = $db->getOne($sql) or die("Wut. No exten");
+
 //Get admin data if exists
-if (file_exists(BRAND . '_' . PRODUCT . '_' . MODEL . '.json')) {
-    $data = file_get_contents(BRAND . '_' . PRODUCT . '_' . MODEL . '.json');
+if (file_exists(BRAND . '_' . PRODUCT . '_' .$model. '.json')) {
+    $data = file_get_contents(BRAND . '_' . PRODUCT . '_' .$model. '.json');
     $saved_data = json_decode($data, TRUE);
     if (!$admin) {
         foreach ($saved_data['admin'] as $key => $data) {
@@ -23,17 +36,34 @@ if (file_exists(BRAND . '_' . PRODUCT . '_' . MODEL . '.json')) {
     }
 }
 
-//Get user data if exists
-if (file_exists(BRAND . '_' . PRODUCT . '_' . MODEL . '_user.json')) {
-    $data = file_get_contents(BRAND . '_' . PRODUCT . '_' . MODEL . '_user.json');
-    $user_data = json_decode($data, TRUE);
-}
-
 include('includes/generate_gui.class');
 
-$gui = new generate_gui();
 
-$output = $gui->create_template_array(BRAND, PRODUCT, MODEL);
+// Lets do some sanity checking. Has this phone been modified?
+if (isset($user_data['provisioned']) != true) {
+	// It hasn't. Lets set it up with some defaults.
+	$lines_default = array(
+		"1" => 'self',
+		"2" => array(
+			"displaynameline" => "BLF - 332",
+			"keytype" => "blf",
+			"blfext" => "332",
+		)
+	);
+	$prov->set_data($ext, 'lineops', array("2" => $lines_default), 'user', 'line');
+	$prov->set_data($ext, 'provisioned', true, 'user', 'line');
+	$prov->set_data($ext, 'has-sidecar1', false, 'user', 'line');
+	$prov->set_data($ext, 'has-sidecar2', false, 'user', 'line');
+
+	// And now, reload our data.
+	$user_data = $prov->get_data($ext, 'user', 'line');
+}
+
+
+$gui = new generate_gui();
+$output = $gui->create_template_array(BRAND, PRODUCT, $model);
+print_r($output);
+exit;
 
 $dont_show = array(
     'option|dial_plan',
@@ -120,7 +150,7 @@ echo '</table>';
 echo '<input type="hidden" name="admin" value="' . $admin . '"/>';
 echo '<input type="hidden" name="brand" value="' . BRAND . '"/>';
 echo '<input type="hidden" name="product" value="' . PRODUCT . '"/>';
-echo '<input type="hidden" name="model" value="' . MODEL . '"/>';
+echo '<input type="hidden" name="model" value="' .$model . '"/>';
 echo '<input type="submit" value="Save" />';
 echo '</form>';
 
