@@ -115,8 +115,6 @@ if (isset($user_data['provisioned']) != true) {
 $gui = new generate_gui();
 $dont_load = array($has_sidecar1,$has_sidecar2);
 
-print_r($dont_load);
-
 $output = $gui->create_template_array(BRAND, PRODUCT, $model,$dont_load);
 
 $dont_show = array(
@@ -168,7 +166,11 @@ foreach ($output['data'] as $sections => $data) {
 
                     $user_value = NULL;
                     if (isset($saved_data)) {
-                        $user_data = isset($user_data) ? $user_data : $saved_data;
+                        if($admin) {
+                            $user_data = $saved_data;
+                        } else {
+                            $user_data = isset($user_data) ? $user_data : $saved_data;
+                        }
                         preg_match('/(.*)\|(.*)/', $var, $matches);
                         switch ($matches[1]) {
                             case 'loop':

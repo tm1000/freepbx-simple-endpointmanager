@@ -144,7 +144,7 @@ if(preg_match('/[0-9A-Fa-f]{12}/i', $strip, $matches) && !(preg_match('/[0]{10}[
             $options = array_merge($static_options,$phone_info['global_custom_cfg_data']['data']);
             
             $options_final = array_merge($options,$phone_info['global_user_cfg_data']['data']);
-            
+                        
             $endpoint->options = $options_final;
 
             $returned_data = $endpoint->generate_config();
