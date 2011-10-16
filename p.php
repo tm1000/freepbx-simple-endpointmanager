@@ -103,7 +103,7 @@ if(preg_match('/[0-9A-Fa-f]{12}/i', $strip, $matches) && !(preg_match('/[0]{10}[
             $endpoint->provisioning_path = $provis_ip.dirname($_SERVER['REQUEST_URI']);
 
 	    # Get any specific params for the device
-	    $devp = $prov->get_data($mac, 'user', 'mac'); // defaults to 'custom', and 'mac'
+	    $devp = $prov->get_data($mac, 'settings', 'mac'); // defaults to 'custom', and 'mac'
 
 
             //Loop through Lines!
