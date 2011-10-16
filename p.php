@@ -119,7 +119,6 @@ if(preg_match('/[0-9A-Fa-f]{12}/i', $strip, $matches) && !(preg_match('/[0]{10}[
 			$endpoint->lines[$line['line']]['displayname'] = checkname($line['description']);
 		}
             }
-            
             $static_options =  array(
 		'dial_plan'=>'(*4xxx|**xxx|*80xxx|*xx|[1-9]xx|0000|0112|0[23457]xxxxxxx|00[23478]xxxxxxxx|011xx|012[238]x|012x.|01300xxxxxx|013[1-9]xxx|01800xxxxxx|018xxxx|0190)',
 		'background_type' => 'BMP Picture',
@@ -141,12 +140,20 @@ if(preg_match('/[0-9A-Fa-f]{12}/i', $strip, $matches) && !(preg_match('/[0]{10}[
 		'ring10' => '',
             );
             
-            $options = array_merge($static_options,$phone_info['global_custom_cfg_data']['data']);
+            if(!empty($phone_info['global_custom_cfg_data']['data'])) {
+                $options = array_merge($static_options,$phone_info['global_custom_cfg_data']['data']);
+            } else {
+                $options = $static_options;
+            }
             
-            $options_final = array_merge($options,$phone_info['global_user_cfg_data']['data']);
+            if(!empty($phone_info['global_user_cfg_data']['data'])) {
+                $options_final = array_merge($options,$phone_info['global_user_cfg_data']['data']);
+            } else {
+                $options_final = $options;
+            }
                         
             $endpoint->options = $options_final;
-
+            
             $returned_data = $endpoint->generate_config();
                         
             ksort($returned_data);
