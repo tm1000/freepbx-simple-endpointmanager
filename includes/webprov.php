@@ -347,7 +347,7 @@ class webprov {
 			}
 
 			# Set the phone's name to be the users name
-                        //TODO: add this back
+			$this->set_data($mac, 'displayname', $name, 'settings', 'mac');
 			do_reload();
 			return true; 
 		}
