@@ -60,10 +60,8 @@ if(isset($mac)) {
 
 $global_settings = $prov->get_data($mac, 'settings', 'mac');
 
-print_r($global_settings);
-
-$has_sidecar1 = !$global_settings['has_sidecar1'] ?  NULL : 'a_unit1.xml';
-$has_sidecar2 = !$global_settings['has_sidecar2'] ?  NULL : 'a_unit2.xml';
+$has_sidecar1 = $global_settings['enable_sidecar1'] ?  NULL : 'a_unit1.xml';
+$has_sidecar2 = $global_settings['enable_sidecar2'] ?  NULL : 'a_unit2.xml';
 
 DEFINE('PROVISIONER_PATH', 'includes/provisioner/');
 DEFINE('BRAND', 'cisco');
@@ -116,6 +114,8 @@ if (isset($user_data['provisioned']) != true) {
 
 $gui = new generate_gui();
 $dont_load = array($has_sidecar1,$has_sidecar2);
+
+print_r($dont_load);
 
 $output = $gui->create_template_array(BRAND, PRODUCT, $model,$dont_load);
 

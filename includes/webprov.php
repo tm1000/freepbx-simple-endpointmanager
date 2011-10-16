@@ -118,6 +118,7 @@ class webprov {
 	$existing[$var]=$val;
 	$newcontents=json_encode($existing);
 	$sql = "UPDATE $tablename SET $colname='$newcontents' where $colid = '$id'";
+        dbug($sql);
         return $this->db->query($sql);
     }
 	

@@ -29,7 +29,10 @@ switch($_REQUEST['type']) {
     case 'manage':
         $sql = "UPDATE simple_endpointman_mac_list SET model = '".$_REQUEST['model']."' WHERE simple_endpointman_mac_list.id = ". $_REQUEST['id'];
         $db->query($sql);
-                
+        
+        $_REQUEST['enable_sidecar1'] = ($_REQUEST['enable_sidecar1'] == "true") ? true : false;
+        $_REQUEST['enable_sidecar2'] = ($_REQUEST['enable_sidecar2'] == "true") ? true : false;
+        
         $prov->set_data($_REQUEST['mac'], 'enable_sidecar1', $_REQUEST['enable_sidecar1'], 'settings', 'mac' );
         $prov->set_data($_REQUEST['mac'], 'enable_sidecar2', $_REQUEST['enable_sidecar2'], 'settings', 'mac' );
         
