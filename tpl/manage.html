@@ -2,7 +2,7 @@
             <a href="#" onclick="history.go(-1)">Back</a>
             <div id="message"></div>
             <table cellspacing="20">
-                <tr><td><strong>Display Name</strong></td><td><strong>Extension</strong></td><td><strong>Old Mac Address</strong></td><td><strong>Phone Model</strong></td><td><strong>Enable Sidecar 1</strong></td><td><strong>Enable Sidecar 2</strong></td><td></td><td></td><td></td></tr>
+                <tr><td><strong>Display Name</strong></td><td><strong>Extension</strong></td><td><strong>MAC Address</strong></td><td><strong>Phone Model</strong></td><td><strong>Sidecar 1</strong></td><td><strong>Sidecar 2</strong></td><td></td><td></td><td></td></tr>
             {loop="devices"}
             <tr id="{$value.id}-row"><td>{$value.description}</td><td>{$value.ext}</td><td><span id="{$value.id}-displaymac">{$value.mac}</span></td><td>
                     <select name="model" id="{$value.id}-model">
