@@ -69,9 +69,6 @@ $admin = isset($_REQUEST['admin']) ? true : false;
 
 if(isset($mac)) {
     $device_info = $prov->get_device_info($mac);
-    if(empty($device_info['global_custom_cfg_data']) && !$admin) {
-        die('Device has not been setup by an admin!');
-    }
 } else {
     die('Mac not set');
 }
@@ -88,14 +85,36 @@ DEFINE('PRODUCT', 'spa5xx');
 
 $only_show = array();
 
+$default_user_allowed = array(
+    'loop|lineops_2_displaynameline',
+    'loop|lineops_2_keytype',
+    'loop|lineops_2_blfext',
+    'loop|lineops_3_displaynameline',
+    'loop|lineops_3_keytype',
+    'loop|lineops_3_blfext',
+    'loop|lineops_4_displaynameline',
+    'loop|lineops_4_keytype',
+    'loop|lineops_4_blfext',
+    'loop|lineops_5_displaynameline',
+    'loop|lineops_5_keytype',
+    'loop|lineops_5_blfext',
+    'loop|lineops_6_displaynameline',
+    'loop|lineops_6_keytype',
+    'loop|lineops_6_blfext'
+);
+
 
 // Get user config data.
 $user_data = $device_info['global_custom_cfg_data'];
 if(isset($mac)) {
     $saved_data = $device_info['global_custom_cfg_data'];
     if (!$admin) {
-        foreach ($saved_data['admin'] as $key => $data) {
-            $only_show[] = $key;
+        if(isset($saved_data['admin'])) {
+            foreach ($saved_data['admin'] as $key => $data) {
+                $only_show[] = $key;
+            }
+        } else {
+            $only_show = $default_user_allowed;
         }
     }
 } else {
@@ -106,29 +125,6 @@ if(isset($mac)) {
 $model = $device_info['model'];
 
 include('includes/generate_gui.class');
-
-/*
-// Lets do some sanity checking. Has this phone been modified?
-if (isset($user_data['provisioned']) != true) {
-	// It hasn't. Lets set it up with some defaults.
-	$lines_default = array(
-		"1" => 'self',
-		"2" => array(
-			"displaynameline" => "BLF - 332",
-			"keytype" => "blf",
-			"blfext" => "332",
-		)
-	);
-	$prov->set_data($ext, 'lineops', array("2" => $lines_default), 'user', 'line');
-	$prov->set_data($ext, 'provisioned', true, 'user', 'line');
-	$prov->set_data($ext, 'has-sidecar1', false, 'user', 'line');
-	$prov->set_data($ext, 'has-sidecar2', false, 'user', 'line');
-
-	// And now, reload our data.
-	$user_data = $prov->get_data($ext, 'user', 'line');
-}
- *
- */
 
 $gui = new generate_gui();
 $dont_load = array($has_sidecar1,$has_sidecar2);
@@ -216,8 +212,11 @@ foreach ($output['data'] as $sections => $data) {
 
                         if(!empty($saved_data['admin'])) {
                             $checked = isset($saved_data['admin'][$var]) ? 'checked' : '';
+                        } else {
+                            //set defaults here
+                            $checked = in_array($var, $default_user_allowed) ? 'checked' : '';
                         }
-                        $admin_out = $admin ? '<input type="checkbox" name="admin|' . $var . '" value="Bike" '.$checked.'/> Allow Users to edit this' : '';
+                        $admin_out = $admin ? '<input type="checkbox" name="admin|' . $var . '" value="Bike" '.$checked.'/> Allow Users to edit this': '';
 
                         echo '<tr><td>' . $output . '</td><td>' . $admin_out . '</td></tr>';
 
