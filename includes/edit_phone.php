@@ -38,8 +38,26 @@ if(isset($_REQUEST['save'])) {
             $sql = "UPDATE simple_endpointman_mac_list SET global_custom_cfg_data = '" . addslashes(json_encode($options)) . "' WHERE mac = '" . $mac . "'";
             $prov->db->query($sql);
     } else {
-            $sql = "UPDATE simple_endpointman_mac_list SET global_user_cfg_data = '" . addslashes(json_encode($options)) . "' WHERE mac = '" . $mac . "'";
-            $prov->db->query($sql);    }
+            //combine user into admin. duh. right?
+            $sql = "SELECT global_custom_cfg_data FROM simple_endpointman_mac_list WHERE mac = '".$mac."'";
+            $db_global_custom_cfg_data = json_decode($prov->db->getOne($sql),TRUE);
+
+            echo "<pre>";
+            foreach($db_global_custom_cfg_data['data'] as $key => $data) {
+                if(isset($options['data'][$key])) {
+                    if(is_array($options['data'][$key])) {
+                        foreach($db_global_custom_cfg_data['data'][$key] as $key2 => $data2) {
+                            $db_global_custom_cfg_data['data'][$key][$key2] = $options['data'][$key][$key2];                            
+                        }
+                    } else {
+                        $db_global_custom_cfg_data['data'][$key] = $options['data'][$key];
+                    }
+                }
+            }
+            $sql = "UPDATE simple_endpointman_mac_list SET global_custom_cfg_data = '" . addslashes(json_encode($db_global_custom_cfg_data)) . "' WHERE mac = '" . $mac . "'";
+            $prov->db->query($sql);
+    }
+            
 }
 
 $bootstrap_settings['freepbx_auth'] = false;
@@ -72,7 +90,7 @@ $only_show = array();
 
 
 // Get user config data.
-$user_data = $device_info['global_user_cfg_data'];
+$user_data = $device_info['global_custom_cfg_data'];
 if(isset($mac)) {
     $saved_data = $device_info['global_custom_cfg_data'];
     if (!$admin) {
