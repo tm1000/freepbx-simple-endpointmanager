@@ -148,7 +148,7 @@ class webprov {
             if(!empty($final_data[$key]['global_settings_override'])) {
                 $final_data[$key]['global_settings_override'] = json_decode($final_data[$key]['global_settings_override'],TRUE);
             } else {
-                $final_data[$key]['global_settings_override'] = array("enable_sidecar1" => true, "enable_sidecar2" => true);
+                $final_data[$key]['global_settings_override'] = array("enable_sidecar1" => false, "enable_sidecar2" => false);
             }
         }
         
