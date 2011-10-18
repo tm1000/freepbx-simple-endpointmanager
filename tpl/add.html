@@ -3,7 +3,7 @@
 	    <table>
 	      <tr>
 		<td>Mac Address:</td>
-		<td colspan=2> <input autofocus="TRUE" type="text" name="mac" id="mac" class="required mac"/> </td>
+		<td colspan=2> <input autofocus="TRUE" type="text" name="mac" id="mac" class="required mac"/> <span id='macstatus'></span> </td>
 	      </tr>
               <tr>
 		<td>Account:</td>
@@ -12,7 +12,7 @@
               <tr>
 	 	<td>Device: </td>
 		<td colspan=2>
-		  <select name="device">
+		  <select name="device" id="device">
 		    {loop="devices"}
 		      <option value="{$value.model}" {if condition="isset($value.selected)"}selected{/if}>{$value.model}</option>
 		    {/loop}
@@ -48,8 +48,35 @@
 	  <div id="status">Status: <span id="statustext"></span></div>
         </div> <!-- /box -->	
 <script>
-            $('#mac').keypress(function(e) {
-                if(e.which == 13) {
+            $('#mac').keyup(function() {
+		if($('#mac').val().length > 2) {
+		    $('#macstatus').html('');
+		}
+		if($('#mac').val().length == 10) {
+		    if($('#mac').val().substring(0,3) == "74-") {
+			$('#mac').val('');
+			$('#macstatus').html('<i>Ignored TAN</i>');
+		    }
+		}
+		if($('#mac').val().length == 11) {
+		    if($('#mac').val().substring(0,3) == "CBT") {
+			$('#mac').val('');
+			$('#macstatus').html('<i>Ignored Serial Number</i>');
+		    }
+		    if($('#mac').val().substring(0,3) == "SPA") {
+			if($('#mac').val().substring(0,7) == "SPA504G") {
+				$('#mac').val('');
+				$('#device').val('SPA504G');
+				$('#macstatus').html('<i>Set Device to SPA504G</i>');
+			}
+			if($('#mac').val().substring(0,7) == "SPA502G") {
+				$('#mac').val('');
+				$('#device').val('SPA502G');
+				$('#macstatus').html('<i>Set Device to SPA502G</i>');
+			}
+		    }
+		}
+                if($('#mac').val().length == 12) {
                     jQuery(this).blur();
                     jQuery('#submit').focus().click();
                 }
