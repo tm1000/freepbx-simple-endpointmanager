@@ -52,7 +52,7 @@ switch($_REQUEST['type']) {
         $vmpin = isset($_REQUEST['vmpin']) ? $_REQUEST['vmpin'] : '0000';
         $email = isset($_REQUEST['emailaddr']) ? $_REQUEST['emailaddr'] : '0000';
         
-        $prov_vars = array("enable_sidecar1" => true, "enable_sidecar2" => true);
+        $prov_vars = array("enable_sidecar1" => false, "enable_sidecar2" => false);
 
         if ($prov->add_device($mac, $device, $ext, $name, $vm, $vmpin, $email,$prov_vars)) {
             $json = array('success' => 'true', 'ext' => $name, 'mac' => $mac);
