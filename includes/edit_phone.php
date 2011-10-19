@@ -39,23 +39,27 @@ if(isset($_REQUEST['save'])) {
             $prov->db->query($sql);
     } else {
             //combine user into admin. duh. right?
-            $sql = "SELECT global_custom_cfg_data FROM simple_endpointman_mac_list WHERE mac = '".$mac."'";
-            $db_global_custom_cfg_data = json_decode($prov->db->getOne($sql),TRUE);
+        $sql = "SELECT global_custom_cfg_data FROM simple_endpointman_mac_list WHERE mac = '" . $mac . "'";
+        $db_global_custom_cfg_data = json_decode($prov->db->getOne($sql), TRUE);
 
-            echo "<pre>";
-            foreach($db_global_custom_cfg_data['data'] as $key => $data) {
-                if(isset($options['data'][$key])) {
-                    if(is_array($options['data'][$key])) {
-                        foreach($db_global_custom_cfg_data['data'][$key] as $key2 => $data2) {
-                            $db_global_custom_cfg_data['data'][$key][$key2] = $options['data'][$key][$key2];                            
+        if (!empty($db_global_custom_cfg_data['data'])) {
+            foreach ($db_global_custom_cfg_data['data'] as $key => $data) {
+                if (isset($options['data'][$key])) {
+                    if (is_array($options['data'][$key])) {
+                        foreach ($db_global_custom_cfg_data['data'][$key] as $key2 => $data2) {
+                            $db_global_custom_cfg_data['data'][$key][$key2] = $options['data'][$key][$key2];
                         }
                     } else {
                         $db_global_custom_cfg_data['data'][$key] = $options['data'][$key];
                     }
                 }
             }
-            $sql = "UPDATE simple_endpointman_mac_list SET global_custom_cfg_data = '" . addslashes(json_encode($db_global_custom_cfg_data)) . "' WHERE mac = '" . $mac . "'";
-            $prov->db->query($sql);
+        } else {
+            $db_global_custom_cfg_data = $options;
+        }
+                
+        $sql = "UPDATE simple_endpointman_mac_list SET global_custom_cfg_data = '" . addslashes(json_encode($db_global_custom_cfg_data)) . "' WHERE mac = '" . $mac . "'";
+        $prov->db->query($sql);
     }
             
 }
