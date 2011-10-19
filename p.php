@@ -30,6 +30,15 @@ if ($filename == "p.php") {
 	$web_path = $web_path."p.php/";
 }
 
+# Firmware Linksys/SPA504G-7.4.3a is broken and MUST be upgraded.
+if (preg_match('/7.4.3a/', $_SERVER['HTTP_USER_AGENT'])) {
+	$str = '<flat-profile><Upgrade_Enable group="Provisioning/Firmware_Upgrade">Yes</Upgrade_Enable>';
+	$str .= '<Upgrade_Rule group="Provisioning/Firmware_Upgrade">http://'.$provis_ip.'/current.bin</Upgrade_Rule></flat-profile>';
+	echo $str;
+	exit;
+}
+
+
 $strip = str_replace('spa', '', $filename);
 if(preg_match('/[0-9A-Fa-f]{12}/i', $strip, $matches) && !(preg_match('/[0]{10}[0-9]{2}/i',$strip))) {
         require_once(PROVISIONER_BASE.'autoload.php');
