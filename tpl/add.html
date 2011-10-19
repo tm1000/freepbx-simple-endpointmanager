@@ -3,7 +3,7 @@
 	    <table>
 	      <tr>
 		<td>Mac Address:</td>
-		<td colspan=2> <input autofocus="TRUE" type="text" name="mac" id="mac" class="required mac"/> <span id='macstatus'></span> </td>
+		<td colspan=2><input autofocus="TRUE" maxlength=20 type="text" name="mac" id="mac" /> <span id='macstatus'></span> </td>
 	      </tr>
               <tr>
 		<td>Account:</td>
@@ -77,9 +77,37 @@
 		    }
 		}
                 if($('#mac').val().length == 12) {
-                    jQuery(this).blur();
-                    jQuery('#submit').focus().click();
+		    if($('#mac').val().substring(0,5) == "6002-") {
+			return;
+		    }
+		    regex=/^([0-9a-f]{2}([:-])){5}([0-9a-f]{2})$|^([0-9a-f]{2}([.])){5}([0-9a-f]{2})$|^([0-9a-f]{12})$/i;
+		    var value=$('#mac').val();
+                    if (regex.test(value)){
+			var clean_mac = value.replace(/:/gi,'');
+			var isvalid = $.ajax({
+			    url: "ajax.php?type=validmac&mac=" + clean_mac,
+			    async: false
+			}).responseText;
+			valid2 = jQuery.parseJSON(isvalid);
+			if (!valid2.status) {
+			    $('#macstatus').html('<i>MAC Already in use</i>');
+			    $('#mac').focus();
+			    $('#mac').select();
+			} else {
+			    $('#macstatus').html('<i>MAC Available</i>');
+			    $('#account').focus();
+			}
+		    } else {
+			$('#macstatus').html('<i>Invalid MAC</i>');
+                    }
                 }
+
+		if($('#mac').val().length == 14) {
+		    if($('#mac').val().substring(0,4) == "6002") {
+			$('#mac').val('');
+			$('#macstatus').html('<i>Ignored Part Number</i>');
+		    }
+		}
             });
 	    $('#account').keyup(function() { 
 		if ($('#account').val().length > 4) {
