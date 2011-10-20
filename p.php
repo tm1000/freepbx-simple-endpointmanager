@@ -10,9 +10,23 @@ include('includes/webprov.php');
 $provis_ip = '192.168.1.5';
 $asterisk_ip = '192.168.1.5';
 if (file_exists('/etc/hipbx.d/hipbx.conf')) {
-        $hipbx = parse_ini_file('/etc/hipbx.d/hipbx.conf', false, INI_SCANNER_RAW);
+        $hipbx = @parse_ini_file('/etc/hipbx.d/hipbx.conf', false, INI_SCANNER_RAW);
 	$provis_ip=$hipbx['http_IP'];
 	$asterisk_ip=$hipbx['asterisk_IP'];
+}
+
+if (file_exists('/etc/hipbx.d/ldap.conf')) {
+        $ldap_conf = @parse_ini_file('/etc/hipbx.d/ldap.conf', false, INI_SCANNER_RAW);
+	$ldap_enabled=true;
+	# Check all required LDAP variables are present
+	$ldap_vars = array('LDAPDIRNAME', 'LDAPHOST', 'LDAPPORT', 'DSN', 'LDAPUSER', 'LDAPPASS', 'SEARCHBASE');
+	# Note that 'LDAPMAP' is optional.
+	foreach ($ldap_vars as $varname) {
+		if (!isset($ldap_conf[$varname])) {
+			$ldap_enabled=false;
+			break;
+		}
+	}
 }
 	
 $prov = new webprov();
@@ -148,6 +162,25 @@ if(preg_match('/[0-9A-Fa-f]{12}/i', $strip, $matches) && !(preg_match('/[0]{10}[
 		'ring9' => '',
 		'ring10' => '',
             );
+
+	    if($ldap_enabled) {
+		# LDAP settings have been supplied. Add them to the phone.
+		$ldap_options = array(
+			'ldap_enabled' => 'Yes',
+			'ldap_name' => $ldap_conf['LDAPDIRNAME'],
+			'ldap_server' => $ldap_conf['LDAPSERVER'],
+			'ldap_account' => $ldap_conf['LDAPUSER'],
+			'ldap_password' => $ldap_conf['LDAPPASS'],
+			'ldap_base' => $ldap_conf['LDAPBASE'],
+		);
+		if (isset($ldap_options['LDAPMAP'])) {
+			$ldap_options['ldap_mapping']=$ldap_options['LDAPMAP'];
+		}
+		if (isset($ldap_options['LDAPATTRS'])) {
+			$ldap_options['ldap_attrs']=$ldap_options['LDAPATTRS'];
+		}
+		$static_options = array_merge($static_options, $ldap_options);
+	    }
             
             if(!empty($phone_info['global_custom_cfg_data']['data'])) {
                 $options = array_merge($static_options,$phone_info['global_custom_cfg_data']['data']);
