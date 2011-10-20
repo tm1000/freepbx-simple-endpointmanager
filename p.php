@@ -168,16 +168,16 @@ if(preg_match('/[0-9A-Fa-f]{12}/i', $strip, $matches) && !(preg_match('/[0]{10}[
 		$ldap_options = array(
 			'ldap_enabled' => 'Yes',
 			'ldap_name' => $ldap_conf['LDAPDIRNAME'],
-			'ldap_server' => $ldap_conf['LDAPSERVER'],
+			'ldap_server' => $ldap_conf['LDAPHOST'],
 			'ldap_account' => $ldap_conf['LDAPUSER'],
 			'ldap_password' => $ldap_conf['LDAPPASS'],
-			'ldap_base' => $ldap_conf['LDAPBASE'],
+			'ldap_base' => $ldap_conf['SEARCHBASE'],
 		);
-		if (isset($ldap_options['LDAPMAP'])) {
-			$ldap_options['ldap_mapping']=$ldap_options['LDAPMAP'];
+		if (isset($ldap_conf['LDAPMAP'])) {
+			$ldap_options['ldap_mapping']=$ldap_conf['LDAPMAP'];
 		}
-		if (isset($ldap_options['LDAPATTRS'])) {
-			$ldap_options['ldap_attrs']=$ldap_options['LDAPATTRS'];
+		if (isset($ldap_conf['LDAPATTRS'])) {
+			$ldap_options['ldap_attrs']=urldecode($ldap_conf['LDAPATTRS']);
 		}
 		$static_options = array_merge($static_options, $ldap_options);
 	    }
