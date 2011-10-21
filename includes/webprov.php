@@ -231,6 +231,9 @@ class webprov {
     }
 
     function add_device($mac,$device,$ext,$name,$vm,$vmpin,$email, $prov_vars) {
+	# Load the configuration file
+	$config = @parse_ini_file('/etc/hipbx.d/provis.conf', false, INI_SCANNER_RAW);
+
         $mac = $this->mac_check_clean($mac);
         
         $secret = $this->genRandomString();
@@ -310,9 +313,9 @@ class webprov {
 		);
 		$vars = array_merge($vars, $vm);
 	}
-	# Is the fax module available? Do we have an email address? If so, add faxing.
-	if (function_exists('fax_detect') && $vars['email'] != '') {
-		# Can we fax? If so, add faxing.
+	# Is FAXRX enabled? Is the fax module available? Do we have an email address? If so, add faxing.
+	if (isset($config['FAXRX']) && function_exists('fax_detect') && $vars['email'] != '') {
+		# OK, Yes, we can fax.
 		$vars['faxenabled']=true;
 		$vars['faxemail']=$vars['email'];
 	}
