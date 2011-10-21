@@ -1,5 +1,5 @@
 <?php
-# Loads a couple of vars from /etc/hipbx.d/ldap.conf
+# Loads a couple of vars from /etc/hipbx.d/provis.conf
 # Should be in the format:
 #
 # LDAPHOST=domaincontroller
@@ -16,13 +16,13 @@ require_once 'includes/provisioner/samples/json.php';
 if (!function_exists('ldap_connect')) {
 	jerror("Unable to do user lookups without php-ldap");
 }
-$config = @parse_ini_file("/etc/hipbx.d/ldap.conf", false, INI_SCANNER_RAW) or  jerror("Unable to parse /etc/hipbx.d/ldap.conf");
+$config = @parse_ini_file("/etc/hipbx.d/provis.conf", false, INI_SCANNER_RAW) or  jerror("Unable to parse /etc/hipbx.d/provis.conf");
 
-isset($config['LDAPHOST']) ? $ldaphost = $config['LDAPHOST'] : jerror('LDAPHOST is not set in ldap.conf');
-isset($config['LDAPPORT']) ? $ldapport = $config['LDAPPORT'] : jerror('LDAPPORT is not set in ldap.conf');
-isset($config['LDAPUSER']) ? $user =     $config['LDAPUSER'] : jerror('LDAPUSER is not set in ldap.conf');
-isset($config['LDAPPASS']) ? $pass =     $config['LDAPPASS'] : jerror('LDAPPASS is not set in ldap.conf');
-isset($config['DSN']) ? $dsn = $config['DSN'] : jerror('DSN is not set in ldap.conf');
+isset($config['LDAPHOST']) ? $ldaphost = $config['LDAPHOST'] : jerror('LDAPHOST is not set in provis.conf');
+isset($config['LDAPPORT']) ? $ldapport = $config['LDAPPORT'] : jerror('LDAPPORT is not set in provis.conf');
+isset($config['LDAPUSER']) ? $user =     $config['LDAPUSER'] : jerror('LDAPUSER is not set in provis.conf');
+isset($config['LDAPPASS']) ? $pass =     $config['LDAPPASS'] : jerror('LDAPPASS is not set in provis.conf');
+isset($config['DSN']) ? $dsn = $config['DSN'] : jerror('DSN is not set in provis.conf');
 
 $ldap = ldap_connect($ldaphost, $ldapport) or jerror("Can't connect to ldap host $ldaphost on port $ldapport");
 ldap_set_option($ldap, LDAP_OPT_PROTOCOL_VERSION,3);

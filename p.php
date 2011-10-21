@@ -15,14 +15,14 @@ if (file_exists('/etc/hipbx.d/hipbx.conf')) {
 	$asterisk_ip=$hipbx['asterisk_IP'];
 }
 
-if (file_exists('/etc/hipbx.d/ldap.conf')) {
-        $ldap_conf = @parse_ini_file('/etc/hipbx.d/ldap.conf', false, INI_SCANNER_RAW);
+if (file_exists('/etc/hipbx.d/provis.conf')) {
+        $provis_conf = @parse_ini_file('/etc/hipbx.d/provis.conf', false, INI_SCANNER_RAW);
 	$ldap_enabled=true;
 	# Check all required LDAP variables are present
 	$ldap_vars = array('LDAPDIRNAME', 'LDAPHOST', 'LDAPPORT', 'DSN', 'LDAPUSER', 'LDAPPASS', 'SEARCHBASE');
 	# Note that 'LDAPMAP' is optional.
 	foreach ($ldap_vars as $varname) {
-		if (!isset($ldap_conf[$varname])) {
+		if (!isset($provis_conf[$varname])) {
 			$ldap_enabled=false;
 			break;
 		}
@@ -167,17 +167,17 @@ if(preg_match('/[0-9A-Fa-f]{12}/i', $strip, $matches) && !(preg_match('/[0]{10}[
 		# LDAP settings have been supplied. Add them to the phone.
 		$ldap_options = array(
 			'ldap_enabled' => 'Yes',
-			'ldap_name' => $ldap_conf['LDAPDIRNAME'],
-			'ldap_server' => $ldap_conf['LDAPHOST'],
-			'ldap_account' => $ldap_conf['LDAPUSER'],
-			'ldap_password' => $ldap_conf['LDAPPASS'],
-			'ldap_base' => $ldap_conf['SEARCHBASE'],
+			'ldap_name' => $provis_conf['LDAPDIRNAME'],
+			'ldap_server' => $provis_conf['LDAPHOST'],
+			'ldap_account' => $provis_conf['LDAPUSER'],
+			'ldap_password' => $provis_conf['LDAPPASS'],
+			'ldap_base' => $provis_conf['SEARCHBASE'],
 		);
-		if (isset($ldap_conf['LDAPMAP'])) {
-			$ldap_options['ldap_mapping']=$ldap_conf['LDAPMAP'];
+		if (isset($provis_conf['LDAPMAP'])) {
+			$ldap_options['ldap_mapping']=$provis_conf['LDAPMAP'];
 		}
-		if (isset($ldap_conf['LDAPATTRS'])) {
-			$ldap_options['ldap_attrs']=urldecode($ldap_conf['LDAPATTRS']);
+		if (isset($provis_conf['LDAPATTRS'])) {
+			$ldap_options['ldap_attrs']=urldecode($provis_conf['LDAPATTRS']);
 		}
 		$static_options = array_merge($static_options, $ldap_options);
 	    }
