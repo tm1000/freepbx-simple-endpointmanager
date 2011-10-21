@@ -18,15 +18,12 @@ if (!function_exists('ldap_connect')) {
 }
 $config = @parse_ini_file("/etc/hipbx.d/ldap.conf", false, INI_SCANNER_RAW) or  jerror("Unable to parse /etc/hipbx.d/ldap.conf");
 
-isset($config['LDAPHOST']) ? $ldaphost = $config['LDAPHOST'] : jerror('LDAPHOST unisset');
-isset($config['LDAPPORT']) ? $ldapport = $config['LDAPPORT'] : jerror('LDAPPORT unisset');
-isset($config['LDAPUSER']) ? $user =     $config['LDAPUSER'] : jerror('LDAPUSER unisset');
-isset($config['LDAPPASS']) ? $pass =     $config['LDAPPASS'] : jerror('LDAPPASS unisset');
-isset($config['DSN']) ? $dsn = $config['DSN'] : jerror('DSN unisset');
+isset($config['LDAPHOST']) ? $ldaphost = $config['LDAPHOST'] : jerror('LDAPHOST is not set in ldap.conf');
+isset($config['LDAPPORT']) ? $ldapport = $config['LDAPPORT'] : jerror('LDAPPORT is not set in ldap.conf');
+isset($config['LDAPUSER']) ? $user =     $config['LDAPUSER'] : jerror('LDAPUSER is not set in ldap.conf');
+isset($config['LDAPPASS']) ? $pass =     $config['LDAPPASS'] : jerror('LDAPPASS is not set in ldap.conf');
+isset($config['DSN']) ? $dsn = $config['DSN'] : jerror('DSN is not set in ldap.conf');
 
-if (isset($ldaphost)) {
-	jerror('Unable to load some /etc/hipbx.d/ldap.conf variables');
-}
 $ldap = ldap_connect($ldaphost, $ldapport) or jerror("Can't connect to ldap host $ldaphost on port $ldapport");
 ldap_set_option($ldap, LDAP_OPT_PROTOCOL_VERSION,3);
 ldap_set_option($ldap, LDAP_OPT_REFERRALS,0);
