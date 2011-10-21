@@ -1,16 +1,10 @@
 <?php
-# Loads a couple of vars from /etc/hipbx.d/provis.conf
-# Should be in the format:
-#
-# LDAPHOST=domaincontroller
-# LDAPPORT=389
-# LDAPUSER=normaluser@domain.com
-# LDAPPASS=theirpassword
-# DSN="dc=domain,dc=com"
-#
-# I expect you to know what you're doing here.
+# Note this requires /etc/hipbx.d/provis.conf to work.
+# See the example file for instructions on how to configure it.
 
-#$_REQUEST['uid']='sfelix';
+# Set this to valid uid for testing, and then you can just run this
+# script from the command line to see if it works.
+#$_REQUEST['uid']='xrobau';
 require_once 'includes/provisioner/samples/json.php';
 
 if (!function_exists('ldap_connect')) {
