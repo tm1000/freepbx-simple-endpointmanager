@@ -223,10 +223,19 @@ class webprov {
 	$this->db->query($sql);
 	$sql = "delete from simple_endpointman_mac_list where mac='$mac'";
 	$this->db->query($sql);
+
 	# Remove DID if there is one
-	#if (isset($config['DIDPREFIX'])) {
-		#$vars['newdid_name']=$name;
-		#$vars['newdid']=$config['DIDPREFIX'].$ext;
+	global $active_modules;
+	$arr=framework_check_destination_usage(true, $active_modules);
+
+	foreach (array_keys($arr['core']) as $did) {
+		if ($arr['core'][$did]['dest'] == "from-did-direct,$ext,1") {
+			preg_match('/Inbound.+\((\d+)\/(.*)\)/', $arr['core'][$did]['description'], $matches);
+			core_did_del($matches[1],$matches[2]);
+			break;
+		}
+	}
+
 	core_devices_del($ext);
 	core_users_del($ext);
 	voicemail_mailbox_remove($ext);
@@ -344,7 +353,6 @@ class webprov {
 	$quietmode=1;
 	ob_start();
 
-
         if($mac) {
             if(core_users_add($vars)) {
                 if(core_devices_add($ext, 'sip', '', 'fixed', $ext, $name)) {
@@ -371,6 +379,7 @@ class webprov {
 
 			# Set the phone's name to be the users name
 			$this->set_data($mac, 'displayname', $name, 'settings', 'mac');
+			do_reload();
 			return true; 
 		}
             }
