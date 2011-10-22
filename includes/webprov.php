@@ -223,6 +223,10 @@ class webprov {
 	$this->db->query($sql);
 	$sql = "delete from simple_endpointman_mac_list where mac='$mac'";
 	$this->db->query($sql);
+	# Remove DID if there is one
+	#if (isset($config['DIDPREFIX'])) {
+		#$vars['newdid_name']=$name;
+		#$vars['newdid']=$config['DIDPREFIX'].$ext;
 	core_devices_del($ext);
 	core_users_del($ext);
 	voicemail_mailbox_remove($ext);
@@ -320,15 +324,31 @@ class webprov {
 		$vars['faxemail']=$vars['email'];
 	}
 
+	# Do we have a hard coded CID?
+	if (isset($config['CIDSET'])) {
+		$vars['outboundcid']=$config['CIDSET'];
+	} elseif (isset($config['CIDPREFIX'])) {
+		$vars['outboundcid']=$config['CIDPREFIX'].$ext;
+	}
+
+	# Do we have a DID Prefix?
+	if (isset($config['DIDPREFIX'])) {
+		$vars['newdid_name']=$name;
+		$vars['newdid']=$config['DIDPREFIX'].$ext;
+	}
+
         $_REQUEST=$vars;
 
-        //Prevent FreePBX from outputting html! So annoying!
-        ob_start();
+        // Prevent FreePBX from outputting anything.
+	global $quietmode;
+	$quietmode=1;
+	ob_start();
+
+
         if($mac) {
             if(core_users_add($vars)) {
                 if(core_devices_add($ext, 'sip', '', 'fixed', $ext, $name)) {
-                        //erase all PHP buffers!
-                        ob_end_clean();
+			ob_end_clean();
                         $sql = "INSERT INTO simple_endpointman_mac_list (mac, model,brand,product,global_settings_override) VALUES ('".$mac."', '".$device."', 'cisco', 'spa5xx','".addslashes(json_encode($prov_vars))."')";
                         dbug($sql);
                         $this->db->query($sql);
@@ -351,13 +371,11 @@ class webprov {
 
 			# Set the phone's name to be the users name
 			$this->set_data($mac, 'displayname', $name, 'settings', 'mac');
-			do_reload();
 			return true; 
 		}
             }
         }
-        //Erase all PHP Buffers!
-        ob_end_clean();
+	ob_end_clean();
         return false;
     }
     
