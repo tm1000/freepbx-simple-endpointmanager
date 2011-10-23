@@ -6,11 +6,6 @@
         Purpose of the stylesheet follows.
 */
 
-/* 
-   TODO customize this sample style
-   Syntax recommendation http://www.w3.org/TR/REC-CSS2/
-*/
-
 .button {
     border-radius: 5px;
     text-shadow: 0 -1px 0 rgba(0,0,0,0.15);
@@ -40,9 +35,10 @@
     left:10%;
     padding:25px;
     margin:25px;
+    overflow: auto;
     }
     
-    #status {
+#status {
     position: bottom;
     border:solid black 1px;
     top:90%;
@@ -52,3 +48,4 @@
     padding:25px;
     margin:25px;
     }
+   

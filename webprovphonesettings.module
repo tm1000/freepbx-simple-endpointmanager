@@ -1,0 +1,124 @@
+<?php
+
+/**
+ * Endpoint Manager ARI File
+ *
+ * @author Andrew Nagy
+ * @license MPL / GPLv2 / LGPL
+ * @package Endpoint Manager
+ */
+/**
+ * @file
+ * Functions for the interface to the call monitor recordings
+ */
+
+/**
+ * Class for settings
+ */
+class webprovphonesettings {
+
+    public $module_name = 'webprovphonesettings';
+    public $extension;
+    public $root_path;
+    public $webprov;
+    public $secret;
+    public $subdir;
+
+    function __construct() {
+        global $amp_conf;
+        global $db;
+
+        $this->extension = isset($_SESSION['ari_user']['extension']) ? $_SESSION['ari_user']['extension'] : '';
+        $this->subdir = '/webprov/';
+        $this->root_path = $amp_conf['AMPWEBROOT'].$this->subdir;
+        
+        $sql = "SELECT data FROM sip WHERE id = '".$this->extension."' AND keyword = 'secret'";
+        $this->secret = md5($db->getOne($sql));
+        
+        if(file_exists($this->root_path.'includes/webprov.php')) {
+            require_once($this->root_path.'includes/webprov.php');
+            $this->webprov = NEW webprov();
+        }
+    }
+
+    /*
+     * rank (for prioritizing modules)
+     */
+
+    function rank() {
+
+        $rank = 21;
+        return $rank;
+    }
+
+    /*
+     * init
+     */
+
+    function init() {
+        
+    }
+
+    /*
+     * Adds menu item to nav menu
+     *
+     * @param $args
+     *   Common arguments
+     */
+
+    function navMenu($args) {
+
+
+        $ret .= "<p><small><small><a href='" . $_SESSION['ARI_ROOT'] . "?m=" . $this->module_name . "&f=display'>" . _("Webprovisioner Settings") . "</a></small></small></p><br>";
+
+        return $ret;
+    }
+
+    /*
+     * Acts on the user settings
+     *
+     * @param $args
+     *   Common arguments
+     * @param $a
+     *   action
+     */
+
+    function action($args) {
+
+        $ret .= "
+      <head>
+        <script>
+        <!--
+          window.location = \"" . $_SESSION['ARI_ROOT'] . "?m=" . $this->module_name . "\"
+        // -->
+        </script>
+    </head>";
+
+        return $ret;
+    }
+
+    function reloadSettings($exten) {
+        
+    }
+
+    /*
+     * Displays stats page
+     *
+     * @param $args
+     *   Common arguments
+     */
+
+    function display($args) {
+        if (!isset($_SESSION['dbh_asterisk'])) {
+            die('No Database?');
+        }
+
+
+        $ret = "<iframe src='http://".$_SERVER["HTTP_HOST"].$this->subdir."user.php?ext=".$this->extension."&md5=".$this->secret."' width='900' height='900' frameborder='0'>
+  <p>Your browser does not support iframes.</p>
+</iframe>";
+        
+        return($ret);
+    }
+
+}
