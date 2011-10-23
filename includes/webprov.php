@@ -232,12 +232,14 @@ class webprov {
 		if ($arr['core'][$did]['dest'] == "from-did-direct,$ext,1") {
 			preg_match('/Inbound.+\((\d+)\/(.*)\)/', $arr['core'][$did]['description'], $matches);
 			core_did_del($matches[1],$matches[2]);
+			fax_delete_incoming($matches[1]);
 			break;
 		}
 	}
 
 	core_devices_del($ext);
 	core_users_del($ext);
+	fax_delete_user($ext);
 	voicemail_mailbox_remove($ext);
 	voicemail_mailbox_del($ext);
 	do_reload();
@@ -308,6 +310,7 @@ class webprov {
             'langcode' => '',
             'record_in' => 'Adhoc',
             'record_out' => 'Adhoc',
+	    'email' => $email,
             'vm' => 'disabled'
         );
 	# But.. is vm REALLY disabled?
@@ -316,7 +319,6 @@ class webprov {
 			'vm' => 'enabled',
 			'mailbox' => $ext,
 			'vmpwd' => $vmpin,
-			'email' => $email,
 			'attach' => 'attach=no',
 			'saycid' => 'saycid=yes',
 			'envelope' => 'envelope=no',
@@ -327,10 +329,10 @@ class webprov {
 		$vars = array_merge($vars, $vm);
 	}
 	# Is FAXRX enabled? Is the fax module available? Do we have an email address? If so, add faxing.
-	if (isset($config['FAXRX']) && function_exists('fax_detect') && $vars['email'] != '') {
+	if (isset($config['FAXRX']) && function_exists('fax_detect') && $email != '') {
 		# OK, Yes, we can fax.
 		$vars['faxenabled']=true;
-		$vars['faxemail']=$vars['email'];
+		$vars['faxemail']=$email;
 	}
 
 	# Do we have a hard coded CID?
@@ -374,7 +376,10 @@ class webprov {
 
 			# Set up faxing if required
 			if ($vars['faxenabled'] === true) {
-				fax_save_user($ext,true,$vars['email']);
+				fax_save_user($ext,'true',$email);
+				if (isset($config['DIDPREFIX'])) {
+					fax_save_incoming('',$vars['newdid'],true,'sip', 4, "ext-fax,$ext,1", null);
+				}
 			}
 
 			# Set the phone's name to be the users name
