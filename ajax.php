@@ -50,7 +50,7 @@ switch($_REQUEST['type']) {
         $name = isset($_REQUEST['displayname']) ? $_REQUEST['displayname'] : $mac;
         $vm = isset($_REQUEST['voicemail']) ? $_REQUEST['voicemail'] : 'no';
         $vmpin = isset($_REQUEST['vmpin']) ? $_REQUEST['vmpin'] : '0000';
-        $email = isset($_REQUEST['emailaddr']) ? $_REQUEST['emailaddr'] : '0000';
+        $email = isset($_REQUEST['emailaddr']) ? $_REQUEST['emailaddr'] : '';
         
         $prov_vars = array("enable_sidecar1" => false, "enable_sidecar2" => false);
 
