@@ -318,6 +318,7 @@ class webprov {
 		$vm = array (
 			'vm' => 'enabled',
 			'mailbox' => $ext,
+			'devinfo_mailbox' => $ext.'@default',
 			'vmpwd' => $vmpin,
 			'attach' => 'attach=no',
 			'saycid' => 'saycid=yes',
