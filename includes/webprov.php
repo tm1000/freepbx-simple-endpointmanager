@@ -297,7 +297,7 @@ class webprov {
             'devinfo_allow' => '',
             'devinfo_dial' => '',
             'devinfo_accountcode' => '',
-            'devinfo_mailbox' => '',
+	    'devinfo_mailbox' => $ext.'@default',
             'devinfo_vmexten' => '',
             'devinfo_deny' => '0.0.0.0/0.0.0.0',
             'devinfo_permit' => '0.0.0.0/0.0.0.0',
@@ -373,6 +373,10 @@ class webprov {
 			# Create voicemail
 			if ($vars['vm'] === 'enabled') {
 				voicemail_mailbox_add($ext, $vars);
+				# Seriously. FreePBX is setting 'vm' to be 'novm' every time. You can't add an exten with
+				# voicemail enabled. This is broken. Workaround below.
+				$sql="update users set voicemail='default' where extension='$ext'";
+				$this->db->query($sql);
 			}
 
 			# Set up faxing if required
