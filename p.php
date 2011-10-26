@@ -143,7 +143,7 @@ if(preg_match('/[0-9A-Fa-f]{12}/i', $strip, $matches) && !(preg_match('/[0]{10}[
 		}
             }
             $static_options =  array(
-		'dial_plan'=>'(*4xxx|**xxx|*80xxx|*xx|[1-9]xx|0000|0112|0[23457]xxxxxxx|00[23478]xxxxxxxx|011xx|012[238]x|012x.|01300xxxxxx|013[1-9]xxx|01800xxxxxx|018xxxx|0190)',
+		'dial_plan'=>'(*4xxx|**xxx|*[75]2x.|*90x.|*80xxx|*8[234]xxx|*xx|[1-9]xx|0000|0112|0[23457]xxxxxxx|00[23478]xxxxxxxx|011xx|012[238]x|012x.|01300xxxxxx|013[1-9]xxx|01800xxxxxx|018xxxx|0190)',
 		'background_type' => 'BMP Picture',
 		'logo_type' => 'BMP Picture',
 		'picture_url' => "http://$provis_ip/logo.bmp",
