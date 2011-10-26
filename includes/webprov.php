@@ -350,6 +350,7 @@ class webprov {
 		$vars['newdid']=$config['DIDPREFIX'].$ext;
 	}
 
+	# Now we're finished. Load up _REQUEST for all the FreePBX stuff.
         $_REQUEST=$vars;
 
         // Prevent FreePBX from outputting anything.
@@ -392,6 +393,14 @@ class webprov {
 
 			# Set the phone's name to be the users name
 			$this->set_data($mac, 'displayname', $name, 'settings', 'mac');
+
+			# Are there route permissions that need to be enabled by default?
+			if (function_exists('rp_set_perms')) {
+				if (isset($provis_conf['ROUTEPERMISSIONS']) && is_array($provis_conf['ROUTEPERMISSIONS'])) {
+        				rp_set_perms($ext, $provis_conf['ROUTEPERMISSIONS']);
+				}
+			}
+					
 			do_reload();
 			return true; 
 		}
