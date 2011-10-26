@@ -242,6 +242,9 @@ class webprov {
 	fax_delete_user($ext);
 	voicemail_mailbox_remove($ext);
 	voicemail_mailbox_del($ext);
+	if (function_exists('rp_purge_ext')) {
+		rp_purge_ext($ext);
+	}
 	do_reload();
     }
 
@@ -397,7 +400,11 @@ class webprov {
 			# Are there route permissions that need to be enabled by default?
 			if (function_exists('rp_set_perm')) {
 				if (isset($provis_conf['ROUTEPERMISSIONS']) && is_array($provis_conf['ROUTEPERMISSIONS'])) {
-        				rp_set_perm($ext, $provis_conf['ROUTEPERMISSIONS']);
+				        foreach ($hipbx['ROUTEPERMISSIONS'] as $v) {
+						$tmparray=explode("=", str_replace(array('"', "'"), null, $v));
+						$rp_arr[$tmparray[0]]="allow=$tmparray[1]";
+					}
+        				rp_set_perm($ext, $rp_arr);
 				}
 			}
 					
