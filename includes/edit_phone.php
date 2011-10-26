@@ -105,7 +105,6 @@ $default_user_allowed = array(
     'loop|lineops_6_displaynameline',
     'loop|lineops_6_keytype',
     'loop|lineops_6_blfext',
-    'option|speed_dial_1',
     'option|speed_dial_2',
     'option|speed_dial_3',
     'option|speed_dial_4',

@@ -395,9 +395,9 @@ class webprov {
 			$this->set_data($mac, 'displayname', $name, 'settings', 'mac');
 
 			# Are there route permissions that need to be enabled by default?
-			if (function_exists('rp_set_perms')) {
+			if (function_exists('rp_set_perm')) {
 				if (isset($provis_conf['ROUTEPERMISSIONS']) && is_array($provis_conf['ROUTEPERMISSIONS'])) {
-        				rp_set_perms($ext, $provis_conf['ROUTEPERMISSIONS']);
+        				rp_set_perm($ext, $provis_conf['ROUTEPERMISSIONS']);
 				}
 			}
 					
