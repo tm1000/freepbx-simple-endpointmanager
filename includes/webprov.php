@@ -318,6 +318,7 @@ class webprov {
 		$vm = array (
 			'vm' => 'enabled',
 			'mailbox' => $ext,
+			'devinfo_voicemail' => 'default',
 			'devinfo_mailbox' => $ext.'@default',
 			'vmpwd' => $vmpin,
 			'attach' => 'attach=no',
@@ -377,6 +378,8 @@ class webprov {
 				# voicemail enabled. This is broken. Workaround below.
 				$sql="update users set voicemail='default' where extension='$ext'";
 				$this->db->query($sql);
+				global $astman;
+				$astman->database_put("AMPUSER",$ext."/voicemail", 'default');
 			}
 
 			# Set up faxing if required
