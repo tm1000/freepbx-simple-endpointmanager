@@ -69,7 +69,7 @@ class webprovphonesettings {
     function navMenu($args) {
 
 
-        $ret .= "<p><small><small><a href='" . $_SESSION['ARI_ROOT'] . "?m=" . $this->module_name . "&f=display'>" . _("Webprovisioner Settings") . "</a></small></small></p><br>";
+        $ret .= "<p><small><small><a href='" . $_SESSION['ARI_ROOT'] . "?m=" . $this->module_name . "&f=display'>" . _("Phone Settings") . "</a></small></small></p><br>";
 
         return $ret;
     }
