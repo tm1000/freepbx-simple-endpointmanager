@@ -179,6 +179,7 @@ $dont_show = array(
     'option|ring10'
 );
 
+echo '<table><tr><td width="50%">';
 echo '<form method="post" id="edit">';
 echo '<table>';
 
@@ -228,8 +229,8 @@ foreach ($output['data'] as $sections => $data) {
                     //Left over breaks that can be safely ignored (basically corn)
                     $output = $gui->generate_html($html_els, $var, $user_value, $only_show, $dont_show);
                     if ($output !== FALSE) {
-                        echo $show_sections ? "<tr><td colspan='2'><h1>" . $sections . "</h1></td></tr>" : '';
-                        echo $show_subsections ? "<tr><td colspan='2'><h2>" . $subsections . "</h2></td></tr>" : '';
+                        echo $show_sections ? "<tr><td colspan='2'><h1 style='text-transform:capitalize'>" . $sections . "</h1></td></tr>" : '';
+                        echo $show_subsections ? "<tr><td colspan='2'><h2 style='text-transform:capitalize'>" . $subsections . "</h2></td></tr>" : '';
 
                         if(!empty($saved_data['admin'])) {
                             $checked = isset($saved_data['admin'][$var]) ? 'checked' : '';
@@ -251,12 +252,10 @@ foreach ($output['data'] as $sections => $data) {
         }
     }
 }
-echo '</table>';
-
 //ghetto hack, will fix later
 $admin_line = $admin ? '<input type="hidden" name="admin" value="' . $admin . '"/>' : '';
 echo $admin_line;
-echo '<input type="hidden" name="brand" value="' . BRAND . '"/>';
+echo '</td></tr><tr><td><input type="hidden" name="brand" value="' . BRAND . '"/>';
 echo '<input type="hidden" name="product" value="' . PRODUCT . '"/>';
 echo '<input type="hidden" name="model" value="' .$model . '"/>';
 echo '<input type="hidden" name="mac" value="' .$mac . '"/>';
@@ -264,3 +263,31 @@ echo '<input type="hidden" name="save" value="true"/>';
 echo '<input type="submit" value="Save" />';
 echo '</form>';
 
+echo '</td></tr></table>';
+# Documentation
+?>
+</td><td style="vertical-align:text-top">
+<h2>Documentation</h2>
+<h4>SPA504G or SPA502G with Sidecar</h4>
+<h5>BLF</h5>
+BLF stands for 'Busy Lamp Field'. This setting allows you to view the status of another
+persons extension, and pick up their extension if it is ringing by pushing the button.
+It also acts as a speed dial, where you can push the button to immediately dial their number.
+Whilst you can set an external number to be a BLF, as there is no way for the phone system to
+check the state of the remote line, the light will stay orange.
+<h5>Line</h5>
+This acts as a spare button for your extension. If a call comes in whilst you are on the phone, 
+having a button assigned to 'Line' makes it easier to pick up the second call.
+<h5>Speed Dial</h5>
+This assigns an explicit speed dial (not related to the ones below) to a button. You can have
+a shortcut to 'Home' or 'Dirvert To Mobile' assigned to this. Ensure that the number you
+put in here is exactly the same as the number you would dial with the keypad (eg, with a leading
+0 if required).
+<h4>Speed Dials 2-9 (All phones)</h4>
+There is no Speed Dial 1. These options set the speed dials that are programmed into the phone. 
+You can program them here, and then activate them by simply pushing the digit and then picking 
+up the handset of the phone. 
+
+</td>
+</tr>
+</table>
