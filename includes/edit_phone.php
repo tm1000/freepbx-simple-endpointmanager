@@ -10,6 +10,11 @@ if(isset($_REQUEST['save'])) {
             switch ($matches[1]) {
                 case 'loop':
                     if (preg_match('/(.*)_(.*)_(.*)/', $matches[2], $matches2)) {
+			if ($matches2[3] === 'displaynameline') {
+			    if ($value === '') {
+				$value = '{$displayname.line.{$count}}';
+			    }
+			}
                         $options['data'][$matches2[1]][$matches2[2]][$matches2[3]] = $value;
                     } else {
                         die('Invalid Loop');
@@ -202,6 +207,10 @@ foreach ($output['data'] as $sections => $data) {
                             case 'loop':
                                 if (preg_match('/(.*)_(.*)_(.*)/', $matches[2], $matches2)) {
                                     $user_value = isset($user_data['data'][$matches2[1]][$matches2[2]][$matches2[3]]) ? $user_data['data'][$matches2[1]][$matches2[2]][$matches2[3]] : $saved_data['data'][$matches2[1]][$matches2[2]][$matches2[3]];
+				    # Explicitly Censor untidy default.
+				    if ($user_value=='{$displayname.line.{$count}}') {
+				      $user_value='';
+				    }
                                 }
                                 break;
                             case 'option':
