@@ -7,6 +7,9 @@ if (!@include_once(getenv('FREEPBX_CONF') ? getenv('FREEPBX_CONF') : '/etc/freep
 }
         
 include('includes/webprov.php');
+?>
+<link rel="stylesheet" href="/recordings/theme/main.css" type="text/css" />
+<?php
 
 $prov = new webprov();
 
