@@ -114,7 +114,7 @@ class webprovphonesettings {
         }
 
 
-        $ret = "<iframe src='http://".$_SERVER["HTTP_HOST"].$this->subdir."user.php?ext=".$this->extension."&md5=".$this->secret."' width='900' height='900' frameborder='0'>
+        $ret = "<iframe src='http://".$_SERVER["HTTP_HOST"].$this->subdir."user.php?ext=".$this->extension."&md5=".$this->secret."' width='900' height='1000' frameborder='0'>
   <p>Your browser does not support iframes.</p>
 </iframe>";
         
