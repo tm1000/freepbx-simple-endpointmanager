@@ -139,7 +139,7 @@
 		if ($('#callgroup').val().length == 0 ) {
 			$('#callgroupinfo').html('');
 		} else {
-			$.getJSON("ajax-callgroup.php?callgroup="+$('#callgroup').val(), function (data) {
+			$.getJSON("ajax-callgroups.php?callgroup="+$('#callgroup').val(), function (data) {
 				if (data['result'] == 'ok') {
 					$('#callgroupinfo').html(data['status']);
 					$('#callgrouptip').html(data['extens']);
