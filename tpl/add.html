@@ -17,7 +17,9 @@
 		      <option value="{$value.model}" {if condition="isset($value.selected)"}selected{/if}>{$value.model}</option>
 		    {/loop}
 		  </select>
-		</td>
+		  Call Group <input size=3 type="text" name="callgroup" id="callgroup"/> <span id='callgroupinfo'></span>
+			<span style='display:none;background-color:#ffa;border:1px solid #cc9;' id='callgrouptip'>This is unseen</span>
+	 	</td>
 	      </tr>
               <tr>
                 <td>Extention Number: </td>
@@ -133,4 +135,17 @@
 			$('#acctinfo').text('');
 		} 
 	    });
+	  $('#callgroup').keyup(function() {
+		if ($('#callgroup').val().length == 0 ) {
+			$('#callgroupinfo').html('');
+		} else {
+			$.getJSON("ajax-callgroup.php?uid="+$('#callgroup').val(), function (data) {
+				if (data['result'] == 'ok') {
+					$('#callgroupinfo').html(data['status']);
+					$('#callgrouptip').html(data['extens']);
+					$('#callgroupinfo').tooltip({tip: '#callgrouptip', effect: 'fade', position: 'top left'});
+				}
+			});
+		}
+	  });
         </script>
