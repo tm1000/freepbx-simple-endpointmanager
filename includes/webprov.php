@@ -248,7 +248,7 @@ class webprov {
 	do_reload();
     }
 
-    function add_device($mac,$device,$ext,$name,$vm,$vmpin,$email, $prov_vars) {
+    function add_device($mac,$device,$ext,$name,$vm,$vmpin,$email,$callgroup, $prov_vars) {
 	# Load the configuration file
 	$config = @parse_ini_file('/etc/hipbx.d/provis.conf', false, INI_SCANNER_RAW);
 
@@ -294,8 +294,8 @@ class webprov {
             'devinfo_qualifyfreq' => '60',
             'devinfo_transport' => 'udp',
             'devinfo_encryption' => 'no',
-            'devinfo_callgroup' => '',
-            'devinfo_pickupgroup' => '',
+            'devinfo_callgroup' => $callgroup,
+            'devinfo_pickupgroup' => $callgroup,
             'devinfo_disallow' => '',
             'devinfo_allow' => '',
             'devinfo_dial' => '',

@@ -51,10 +51,11 @@ switch($_REQUEST['type']) {
         $vm = isset($_REQUEST['voicemail']) ? $_REQUEST['voicemail'] : 'no';
         $vmpin = isset($_REQUEST['vmpin']) ? $_REQUEST['vmpin'] : '0000';
         $email = isset($_REQUEST['emailaddr']) ? $_REQUEST['emailaddr'] : '';
+        $callgroup = isset($_REQUEST['callgroup']) ? $_REQUEST['callgroup'] : '';
         
         $prov_vars = array("enable_sidecar1" => false, "enable_sidecar2" => false);
 
-        if ($prov->add_device($mac, $device, $ext, $name, $vm, $vmpin, $email,$prov_vars)) {
+        if ($prov->add_device($mac, $device, $ext, $name, $vm, $vmpin, $email, $callgroup, $prov_vars)) {
             $json = array('success' => 'true', 'ext' => $name, 'mac' => $mac);
         } else {
             $json = array('success' => 'false');
