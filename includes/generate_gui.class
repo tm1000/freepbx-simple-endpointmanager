@@ -144,7 +144,7 @@ class generate_gui {
         if((empty($disallowed) OR !in_array($variable, $disallowed)) AND (empty($allowed) OR in_array($variable, $allowed))) {
             $value = isset($html_els['value']) ? $html_els['value'] : $this->fix_single_array_keys($html_els['default_value']);
             $value = isset($override_value) ? $override_value : $value;
-            print_r($html_els);
+            #print_r($html_els);
             switch ($html_els['type']) {
                 case 'input':
                     $html = $html_els['description'] . ': <input type="text" name="' . $variable . '" value="' . $value . '"/>';
