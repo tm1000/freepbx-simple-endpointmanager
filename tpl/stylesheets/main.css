@@ -27,12 +27,12 @@
 }
 
 #box {
-    position:absolute;
+    position:fixed;
     border:solid black 1px;
-    top:10%;
-    right:10%;
-    bottom:10%;
-    left:10%;
+    top:10px;
+    right:10px;
+    bottom:10px;
+    left:10px;
     padding:25px;
     margin:25px;
     overflow: auto;
@@ -49,3 +49,4 @@
     margin:25px;
     }
    
+html, body { height: 100%; width: 100% }
