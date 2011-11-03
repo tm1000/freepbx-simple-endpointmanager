@@ -18,6 +18,8 @@ if(!$blank) {
     $prov->tpl->draw( 'header' );
     switch($location) {
         case 'add':
+            $start_mac = isset($_REQUEST['mac']) ? $_REQUEST['mac'] : '';
+            $prov->tpl->assign( 'start_mac', $start_mac );
             $prov->tpl->assign( 'devices', $prov->get_devices('SPA502G') );
             $prov->tpl->draw( 'add' );
             break;
