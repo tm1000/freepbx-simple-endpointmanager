@@ -262,6 +262,8 @@ echo '<input type="hidden" name="mac" value="' .$mac . '"/>';
 echo '<input type="hidden" name="save" value="true"/>';
 echo '<input type="submit" value="Save" />';
 echo '</form>';
+echo '<h4>Warning: Pressing the Save button may cause your phone to reboot and your Citrix Session to terminate. <br />';
+echo 'SAVE ALL WORK before submitting these changes.</h4>';
 
 echo '</td></tr></table>';
 # Documentation
@@ -269,6 +271,7 @@ echo '</td></tr></table>';
 </td><td style="vertical-align:text-top">
 <h2>Documentation</h2>
 <h4>SPA504G or SPA502G with Sidecar</h4>
+<h5>Changes made here will not be applied until your phone reboots. This may cause your Citrix Session to terminate. Save all work before applying changes.</h5>
 <h5>BLF</h5>
 BLF stands for 'Busy Lamp Field'. This setting allows you to view the status of another
 persons extension, and pick up their extension if it is ringing by pushing the button.
@@ -280,7 +283,7 @@ This acts as a spare button for your extension. If a call comes in whilst you ar
 having a button assigned to 'Line' makes it easier to pick up the second call.
 <h5>Speed Dial</h5>
 This assigns an explicit speed dial (not related to the ones below) to a button. You can have
-a shortcut to 'Home' or 'Dirvert To Mobile' assigned to this. Ensure that the number you
+a shortcut to 'Home' or 'Divert To Mobile' assigned to this. Ensure that the number you
 put in here is exactly the same as the number you would dial with the keypad (eg, with a leading
 0 if required).
 <h4>Speed Dials 2-9 (All phones)</h4>
