@@ -245,8 +245,9 @@ class webprov {
 	if (function_exists('rp_purge_ext')) {
 		rp_purge_ext($ext);
 	}
-	do_reload();
-    }
+	needreload();
+	/* do_reload(); */
+   }
 
     function add_device($mac,$device,$ext,$name,$vm,$vmpin,$email,$callgroup, $prov_vars) {
 	# Load the configuration file
@@ -408,7 +409,8 @@ class webprov {
 				}
 			}
 					
-			do_reload();
+			needreload();
+		/*	do_reload(); */
 			return true; 
 		}
             }
