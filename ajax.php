@@ -52,8 +52,9 @@ switch($_REQUEST['type']) {
         $vmpin = isset($_REQUEST['vmpin']) ? $_REQUEST['vmpin'] : '0000';
         $email = isset($_REQUEST['emailaddr']) ? $_REQUEST['emailaddr'] : '';
         $callgroup = isset($_REQUEST['callgroup']) ? $_REQUEST['callgroup'] : '';
+        $network = isset($_REQUEST['network']) ? $_REQUEST['network'] : '';
         
-        $prov_vars = array("enable_sidecar1" => false, "enable_sidecar2" => false);
+        $prov_vars = array("enable_sidecar1" => false, "enable_sidecar2" => false, "network" => $network);
 
         if ($prov->add_device($mac, $device, $ext, $name, $vm, $vmpin, $email, $callgroup, $prov_vars)) {
             $json = array('success' => 'true', 'ext' => $name, 'mac' => $mac);
