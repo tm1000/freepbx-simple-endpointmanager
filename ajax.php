@@ -7,8 +7,6 @@ if (!@include_once(getenv('FREEPBX_CONF') ? getenv('FREEPBX_CONF') : '/etc/freep
 include('includes/webprov.php');
 $prov = new webprov();
 
-$_REQUEST['type']='network';
-
 switch($_REQUEST['type']) {
     case 'validext':
         $sql = 'SELECT * FROM devices WHERE id = '. $_REQUEST['ext'];
