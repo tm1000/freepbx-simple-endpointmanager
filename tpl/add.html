@@ -49,7 +49,7 @@
 		  {loop="networks"}
 		      <option value="{$value.name}" {if condition="isset($value.selected)"}selected{/if}>{$value.name}</option>
 		  {/loop}
-		</select></td>
+		</select> &nbsp; <span id="networktext"></span></td>
               </tr>
 	    </table>
 	    <input type="hidden" name="type" value="add"/>
@@ -133,6 +133,7 @@
 					$('#vmsel').val(data['voicemail']);
 					$('#acctinfo').html(data['status']);
 					$('#statustext').html('');
+					updateip();
 				} else {
 					$('#acctinfo').html('AJAX Error');
 					$('#statustext').html(data['status']);
@@ -143,6 +144,12 @@
 			$('#acctinfo').text('');
 		} 
 	    });
+	  $('#ext').keyup(function() {
+		updateip();
+	  });
+	  $('#network').change(function() {
+		updateip();
+	  });
 	  $('#callgroup').keyup(function() {
 		if ($('#callgroup').val().length == 0 ) {
 			$('#callgroupinfo').html('');
@@ -161,4 +168,18 @@
 			});
 		}
 	  });
+	function updateip() {
+		if ($('#ext').val().length != 3) {
+		   $('#networktext').html('');
+		} else {
+		   $('#networktext').html('<i>Checking...</i>');
+		   $.getJSON("ajax.php?type=network&net="+$('#network').val()+"&ext="+$('#ext').val(), function (data) {
+			if (data['result'] == 'ok') {
+			    $('#networktext').html(data['text']);
+			} else {
+			    $('#networktext').html('Unknown Ajax Error. Sorry!');
+			}
+		   });
+		}
+	}
         </script>

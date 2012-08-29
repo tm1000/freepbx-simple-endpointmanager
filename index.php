@@ -21,7 +21,7 @@ if(!$blank) {
 	    $provis_conf = @parse_ini_file('/etc/hipbx.d/provis.conf', false, INI_SCANNER_RAW);
   	    $nets=array();
 	    if (!isset($provis_conf['NETWORK'])) {
-		$nets = array('name' => 'Unconfigured');
+		$nets = array(array('name' => 'Unconfigured'));
 	    } else {
 		foreach($provis_conf['NETWORK'] as $name =>  $net) {
 		    array_push($nets, array('name' => $name, 'network' => $net));

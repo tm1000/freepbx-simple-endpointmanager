@@ -7,6 +7,8 @@ if (!@include_once(getenv('FREEPBX_CONF') ? getenv('FREEPBX_CONF') : '/etc/freep
 include('includes/webprov.php');
 $prov = new webprov();
 
+$_REQUEST['type']='network';
+
 switch($_REQUEST['type']) {
     case 'validext':
         $sql = 'SELECT * FROM devices WHERE id = '. $_REQUEST['ext'];
@@ -78,6 +80,38 @@ switch($_REQUEST['type']) {
             $json = array('success' => false, 'message' => 'ID or Mac not set');
         }
         break;
+    case 'network':
+	$provis_conf = @parse_ini_file('/etc/hipbx.d/provis.conf', false, INI_SCANNER_RAW);
+	$nets=array();
+	if (!isset($provis_conf['NETWORK'])) {
+	  $json = array('result' => 'ok', 'text' => 'DHCP Provisioning Not Configured');
+	  break;
+	}
+	if (!is_numeric($_REQUEST['ext'])) {
+	  $json = array('result' => 'ok', 'text' => 'Extension supplied is not a number?');
+	  break;
+	}
+	# If we don't find it, we want a reasonable error.
+	$json = array('result' => 'ok', 'text' => "Odd things happening. Can't find requested network.");
+
+	foreach($provis_conf['NETWORK'] as $name =>  $net) {
+	   if ($name == $_REQUEST['net']) {
+	      # Sanity check the networks. It shouldn't have a length.
+	      if (preg_match('/\//', $net)) {
+	  	$json = array('result' => 'ok', 'text' => "Network $name incorrectly configured (has a /length) in /etc/hipbx.d/provis.conf");
+		break;
+	      }
+	      if (!preg_match('/(\d+)\.(\d+)\.(\d+).(\d+)/', $net, $matches)) {
+	  	$json = array('result' => 'ok', 'text' => "Unable to parse $net from /etc/hipbx.d/provis.conf - should be like 10.4.0.0");
+		break;
+	      }
+	      # OK, Finally. Everything seems ok. Lets generate an IP address.
+	      preg_match('/(\d)(\d)(\d)/', $_REQUEST['ext'], $extsplit);
+	      $json = array('result' => 'ok', 'text' => "IP Address assigned: $matches[1].$matches[2].10$extsplit[1].$extsplit[2]$extsplit[3]");
+	      break;
+	   }
+	}
+	break;
     default:
         $json = array('status' => false);
         break;
