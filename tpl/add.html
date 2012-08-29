@@ -2,8 +2,8 @@
 	  <form method="post" action="ajax.php" id="add">
 	    <table>
 	      <tr>
-		<td>Mac Address:</td>
-		<td colspan=2><input autofocus="TRUE" maxlength=20 type="text" name="mac" id="mac" value="{$start_mac}"/> <span id='macstatus'></span> </td>
+		<td>MAC Address:</td>
+		<td colspan=2><input autofocus="TRUE" maxlength=20 type="text" name="mac" id="mac" value="{$start_mac}"/> <span id='macstatus'>Note you can also scan any barcode on the back of the phone</span> </td>
 	      </tr>
               <tr>
 		<td>Account:</td>
@@ -43,6 +43,14 @@
                 <td>Email Address:</td>
 		<td colspan=2><input type="text" name="emailaddr" id="emailaddr"/></td>
 	      </tr>
+	      <tr>
+		<td>Network:</td>
+		<td colspan=2><select name="network" id="network">
+		  {loop="networks"}
+		      <option value="{$value.name}" {if condition="isset($value.selected)"}selected{/if}>{$value.name}</option>
+		  {/loop}
+		</select></td>
+              </tr>
 	    </table>
 	    <input type="hidden" name="type" value="add"/>
 	    <input type="submit" value="Save" />

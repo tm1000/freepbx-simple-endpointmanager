@@ -18,9 +18,19 @@ if(!$blank) {
     $prov->tpl->draw( 'header' );
     switch($location) {
         case 'add':
+	    $provis_conf = @parse_ini_file('/etc/hipbx.d/provis.conf', false, INI_SCANNER_RAW);
+  	    $nets=array();
+	    if (!isset($provis_conf['NETWORK'])) {
+		$nets = array('name' => 'Unconfigured');
+	    } else {
+		foreach($provis_conf['NETWORK'] as $name =>  $net) {
+		    array_push($nets, array('name' => $name, 'network' => $net));
+		}
+	    }
             $start_mac = isset($_REQUEST['mac']) ? $_REQUEST['mac'] : '';
             $prov->tpl->assign( 'start_mac', $start_mac );
             $prov->tpl->assign( 'devices', $prov->get_devices('SPA502G') );
+            $prov->tpl->assign( 'networks', $nets );
             $prov->tpl->draw( 'add' );
             break;
         case 'swap':
