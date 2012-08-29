@@ -28,6 +28,18 @@ if (file_exists('/etc/hipbx.d/provis.conf')) {
 		}
 	}
 }
+
+# Multihoming support:
+# Assume(!) that the last two octets of asterisk_IP are the same on all
+# networks. So when we're telling the phone what SIP Server to connect to,
+# take the first two octets of the IP address the phone has connected to,
+# and then add the last two from asterisk_ip
+
+$myip = preg_split('/\./', $_SERVER['SERVER_ADDR']);
+$astip = preg_split('/\./', $asterisk_ip);
+
+$realip = $myip[0].".".$myip[1].".".$astip[2].".".$astip[3];
+
 	
 $prov = new webprov();
 
@@ -118,7 +130,7 @@ if(preg_match('/[0-9A-Fa-f]{12}/i', $strip, $matches) && !(preg_match('/[0]{10}[
             $endpoint->DateTimeZone = new DateTimeZone('Australia/Brisbane');
 
             //Server IP Address & Port
-            $endpoint->server[1]['ip'] = $asterisk_ip;
+            $endpoint->server[1]['ip'] = $realip;
             $endpoint->server[1]['port'] = 5060;
 
             //$endpoint->proxy[1]['ip'] = $data['data']['statics']['proxyserver'];
